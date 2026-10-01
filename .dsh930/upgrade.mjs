@@ -2,6 +2,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, relative } from 'node:path';
 import { spawnSync } from 'node:child_process';
+import { isDeepStrictEqual } from 'node:util';
 
 const root = process.cwd();
 if (!/^24\./.test(process.versions.node)) throw new Error('Node 24 is required');
@@ -69,13 +70,29 @@ for (const item of workspaces) {
     } else if (!/^(?:[~^<>=*\d]|latest$|catalog:)/.test(spec)) protect(name, `Nonstandard source: ${spec}`);
   }
 }
+for (const [name, range] of Object.entries(config('peerDependencyRules')?.allowedVersions ?? {})) {
+  protect(name, `Upstream explicit compatibility range: ${range}`);
+}
+const exactPins = [];
+for (const item of workspaces) {
+  if (item.workspace.startsWith('vendor/')) continue;
+  const current = json(resolve(item.path, 'package.json'));
+  for (const section of sections) for (const [name, spec] of Object.entries(current[section] ?? {})) {
+    if (deferred.has(name) || name === 'pnpm' || name === '@types/node') continue;
+    if (/^\d+\.\d+\.\d+$/.test(spec)) {
+      exactPins.push({ path: item.path, section, name });
+      current[section][name] = `${spec.startsWith('0.') ? '~' : '^'}${spec}`;
+    }
+  }
+  save(resolve(item.path, 'package.json'), current);
+}
 const policyKeys = ['patchedDependencies', 'overrides', 'allowBuilds', 'minimumReleaseAge', 'minimumReleaseAgeExclude', 'strictDepBuilds', 'trustPolicy', 'peerDependencyRules'];
 const policies = Object.fromEntries(policyKeys.map(key => [key, config(key)]));
 const report = {
   node: process.version, pnpm: pnpmVersion, workspaceCount: workspaces.length,
   status: 'resolving', changes: [],
   deferred: [...deferred].map(([name, reasons]) => ({ name, reasons })),
-  scope: 'Ordinary registry dependencies; workspace links, vendored source, peer API ranges and reviewed patched/native groups retained',
+  scope: 'Compatible registry updates within declared ranges; ordinary exact pins move within the same compatible release line and remain exact. Node and pnpm are explicitly migrated. Major/API-breaking upgrades and patched/native groups require separate validation.',
 };
 save('.dsh930/dependency-upgrade.json', report);
 try {
@@ -83,7 +100,25 @@ try {
   pm(['config', 'set', '--location=project', '--json', 'engineStrict', 'true']);
   const recursive = ['--filter', '!./vendor/**', '-r', '--include-workspace-root'];
   pm([...recursive, 'update', '@types/node@24', '--lockfile-only', '--ignore-scripts']);
-  pm([...recursive, 'update', '--latest', '--lockfile-only', '--ignore-scripts', '*', '!@types/node', '!pnpm', ...[...deferred.keys()].sort().map(name => `!${name}`)]);
+  pm([...recursive, 'update', '--lockfile-only', '--ignore-scripts', '*', '!@types/node', '!pnpm', ...[...deferred.keys()].sort().map(name => `!${name}`)]);
+  for (const item of workspaces) {
+    if (item.workspace.startsWith('vendor/')) continue;
+    const current = json(resolve(item.path, 'package.json'));
+    // pnpm deduplicates a declaration present in both runtime and dev sections.
+    // Preserve every original section, especially runtime dependencies.
+    for (const section of sections) for (const name of Object.keys(item.before[section] ?? {})) {
+      if (current[section]?.[name] !== undefined) continue;
+      const spec = sections.map(key => current[key]?.[name]).find(value => value !== undefined);
+      if (spec === undefined) throw new Error(`Dependency removed: ${item.workspace}/${name}`);
+      current[section] ??= {};
+      current[section][name] = spec;
+    }
+    for (const pin of exactPins.filter(pin => pin.path === item.path)) {
+      current[pin.section][pin.name] = current[pin.section][pin.name].replace(/^[~^]/, '');
+    }
+    save(resolve(item.path, 'package.json'), current);
+  }
+  pm(['install', '--lockfile-only', '--ignore-scripts']);
   for (const item of workspaces) {
     const after = json(resolve(item.path, 'package.json'));
     for (const section of sections) for (const [name, from] of Object.entries(item.before[section] ?? {})) {
@@ -91,10 +126,11 @@ try {
       if (local.test(from) && to !== from) throw new Error(`Workspace link changed: ${item.workspace}/${name}`);
       if (from !== to) report.changes.push({ workspace: item.workspace, section, name, from, to });
     }
-    if (item.workspace.startsWith('vendor/') && JSON.stringify(item.before) !== JSON.stringify(after)) throw new Error(`Vendored manifest changed: ${item.workspace}`);
+    if (item.workspace.startsWith('vendor/') && !isDeepStrictEqual(item.before, after)) throw new Error(`Vendored manifest changed: ${item.workspace}`);
   }
   for (const key of policyKeys) {
-    if (JSON.stringify(config(key)) !== JSON.stringify(policies[key])) throw new Error(`Supply-chain policy changed: ${key}`);
+    const after = config(key);
+    if (!isDeepStrictEqual(after, policies[key])) throw new Error(`Supply-chain policy changed: ${key}: ${JSON.stringify({ before: policies[key], after })}`);
   }
   report.status = 'resolved-not-yet-validated';
 } catch (error) {

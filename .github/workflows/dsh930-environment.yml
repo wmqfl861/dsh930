@@ -44,6 +44,7 @@ jobs:
           [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
           npm install --global "pnpm@$version"
           echo "DSH930_PNPM_VERSION=$version" >> "$GITHUB_ENV"
+          echo "PNPM_CONFIG_STORE_DIR=$GITHUB_WORKSPACE/.pnpm-store" >> "$GITHUB_ENV"
           mkdir -p "$RUNNER_TEMP/dsh930-results"
           node --version
           cc --version | head -1
@@ -140,6 +141,9 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/dsh930-results"
           git rev-parse HEAD > "$RUNNER_TEMP/dsh930-results/source-head.txt"
+          git bundle create "$RUNNER_TEMP/dsh930-results/repository.bundle" --all
+          node_root="$(dirname "$(dirname "$(readlink -f "$(command -v node)")")")"
+          tar -czf "$RUNNER_TEMP/dsh930-results/node24-pnpm.tar.gz" -C "$node_root" .
           git diff --binary > "$RUNNER_TEMP/dsh930-results/changes.patch"
           cp .dsh930/*.json "$RUNNER_TEMP/dsh930-results/" 2>/dev/null || true
           tar --exclude='./.git' --exclude='./.env' --exclude='./.env.*' --exclude='./apps/desktop/.env.windows' --exclude='./apps/desktop/.env.macos' -czf "$RUNNER_TEMP/dsh930-workspace.tar.gz" .
