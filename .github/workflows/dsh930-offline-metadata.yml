@@ -1,0 +1,116 @@
+name: dsh930 complete offline metadata
+
+on:
+  push:
+    branches: [ops/artifact-transfer]
+    paths: [.github/workflows/dsh930-offline-metadata.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  CI: 'true'
+  DSH_TELEMETRY_DISABLED: '1'
+
+jobs:
+  export:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 0dc80141c8b55432fa2dfb01ad6f9fd64b51e152
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - name: Install pinned package manager
+        run: |
+          npm install --global pnpm@12.8.1
+          echo "PNPM_CONFIG_STORE_DIR=$GITHUB_WORKSPACE/.pnpm-store" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          name: dsh930-package-store
+          run-id: 36813104476
+          github-token: ${{ github.token }}
+          repository: wmqfl861/dsh930
+          path: ${{ runner.temp }}/store
+      - uses: actions/download-artifact@v4
+        with:
+          name: dsh930-finished-environment-checkpoint
+          run-id: 36815842580
+          github-token: ${{ github.token }}
+          repository: wmqfl861/dsh930
+          path: ${{ runner.temp }}/checkpoint
+      - name: Restore verified package cache
+        run: |
+          set -euo pipefail
+          tar -xzf "$RUNNER_TEMP/store/package-store.tar.gz"
+          tar -xzf "$RUNNER_TEMP/checkpoint/package-cache-delta.tar.gz"
+          cp "$RUNNER_TEMP/checkpoint/package-index.db" .pnpm-store/v11/index.db
+          mkdir -p "$HOME/.cache/pnpm" "$RUNNER_TEMP/results"
+          tar -xzf "$RUNNER_TEMP/checkpoint/pnpm-metadata.tar.gz" -C "$HOME/.cache/pnpm"
+          find .pnpm-store/v11/files -type f | sort > "$RUNNER_TEMP/before.txt"
+      - name: Verify frozen lockfile and install with all security policies enabled
+        run: |
+          set -euo pipefail
+          pnpm install --frozen-lockfile > "$RUNNER_TEMP/results/install.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/install.log"; exit 1; }
+          git diff --exit-code -- pnpm-lock.yaml pnpm-workspace.yaml package.json
+          pnpm install --offline --frozen-lockfile > "$RUNNER_TEMP/results/offline-install.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/offline-install.log"; exit 1; }
+          node --version > "$RUNNER_TEMP/results/node-version.txt"
+          pnpm --version > "$RUNNER_TEMP/results/pnpm-version.txt"
+      - name: Export complete metadata and any missing package files
+        run: |
+          set -euo pipefail
+          test -d "$HOME/.cache/pnpm/v11/metadata-full"
+          tar -czf "$RUNNER_TEMP/metadata-full.tar.gz" -C "$HOME/.cache/pnpm" v11/metadata-full
+          mkdir -p "$RUNNER_TEMP/parts"
+          split -b 240M -d "$RUNNER_TEMP/metadata-full.tar.gz" "$RUNNER_TEMP/parts/metadata.part-"
+          (cd "$RUNNER_TEMP/parts"; sha256sum metadata.part-*) > "$RUNNER_TEMP/results/metadata-parts.sha256"
+          sha256sum "$RUNNER_TEMP/metadata-full.tar.gz" > "$RUNNER_TEMP/results/metadata-full.sha256"
+          find .pnpm-store/v11/files -type f | sort > "$RUNNER_TEMP/after.txt"
+          comm -13 "$RUNNER_TEMP/before.txt" "$RUNNER_TEMP/after.txt" > "$RUNNER_TEMP/new.txt"
+          tar -czf "$RUNNER_TEMP/results/cache-delta.tar.gz" -T "$RUNNER_TEMP/new.txt"
+          python3 - <<'PY'
+          import sqlite3, os
+          with sqlite3.connect('.pnpm-store/v11/index.db') as source:
+              with sqlite3.connect(os.environ['RUNNER_TEMP'] + '/results/index.db') as target:
+                  source.backup(target)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-offline-verification
+          path: ${{ runner.temp }}/results/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-full-metadata-00
+          path: ${{ runner.temp }}/parts/metadata.part-00
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-full-metadata-01
+          path: ${{ runner.temp }}/parts/metadata.part-01
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-full-metadata-02
+          path: ${{ runner.temp }}/parts/metadata.part-02
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: ignore
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-full-metadata-03
+          path: ${{ runner.temp }}/parts/metadata.part-03
+          compression-level: 0
+          retention-days: 7
+          if-no-files-found: ignore
