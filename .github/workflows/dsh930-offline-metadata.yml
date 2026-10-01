@@ -59,14 +59,16 @@ jobs:
           set -euo pipefail
           pnpm install --frozen-lockfile > "$RUNNER_TEMP/results/install.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/install.log"; exit 1; }
           git diff --exit-code -- pnpm-lock.yaml pnpm-workspace.yaml package.json
-          pnpm install --offline --frozen-lockfile > "$RUNNER_TEMP/results/offline-install.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/offline-install.log"; exit 1; }
+          git clone --local "$GITHUB_WORKSPACE" "$RUNNER_TEMP/offline-rehearsal"
+          pnpm --dir "$RUNNER_TEMP/offline-rehearsal" install --offline --frozen-lockfile > "$RUNNER_TEMP/results/offline-install.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/offline-install.log"; exit 1; }
           node --version > "$RUNNER_TEMP/results/node-version.txt"
           pnpm --version > "$RUNNER_TEMP/results/pnpm-version.txt"
-      - name: Export complete metadata and any missing package files
+      - name: Export all metadata formats and any missing package files
         run: |
           set -euo pipefail
-          test -d "$HOME/.cache/pnpm/v11/metadata-full"
-          tar -czf "$RUNNER_TEMP/metadata-full.tar.gz" -C "$HOME/.cache/pnpm" v11/metadata-full
+          test -d "$HOME/.cache/pnpm/v11/metadata-full-filtered"
+          find "$HOME/.cache/pnpm/v11" -maxdepth 2 -type d > "$RUNNER_TEMP/results/cache-layout.txt"
+          tar -czf "$RUNNER_TEMP/metadata-full.tar.gz" -C "$HOME/.cache/pnpm" v11
           mkdir -p "$RUNNER_TEMP/parts"
           split -b 240M -d "$RUNNER_TEMP/metadata-full.tar.gz" "$RUNNER_TEMP/parts/metadata.part-"
           (cd "$RUNNER_TEMP/parts"; sha256sum metadata.part-*) > "$RUNNER_TEMP/results/metadata-parts.sha256"
