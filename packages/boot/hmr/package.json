@@ -38,7 +38,7 @@
   "dependencies": {
     "@babel/code-frame": "^7.29.7",
     "@deepseek-ai/schemastery": "workspace:~",
-    "chokidar": "^4.0.3",
+    "chokidar": "^5.0.0",
     "picomatch": "^4.0.7"
   },
   "devDependencies": {
