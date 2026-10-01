@@ -1,0 +1,121 @@
+name: dsh930 frozen development baseline
+
+on:
+  push:
+    branches: [main, 'dev/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dsh930-frozen-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CI: 'true'
+  DSH_TELEMETRY_DISABLED: '1'
+  NODE_OPTIONS: --max-old-space-size=6144
+
+jobs:
+  container:
+    name: Clean development container
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Build the same image used by Codespaces
+        run: docker build --progress=plain -f .devcontainer/Dockerfile -t dsh930-dev .
+      - name: Run the exact post-create acceptance path as an unprivileged user
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp/dsh930-home -e CI=true \
+            -v "$PWD:/workspaces/dsh930" -w /workspaces/dsh930 \
+            dsh930-dev bash .devcontainer/setup.sh
+      - name: Verify tracked files were not rewritten by installation or build
+        run: git diff --exit-code
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: development-container-results
+          path: .artifacts/dsh930-development/
+          include-hidden-files: true
+          retention-days: 14
+      - name: Export the exact built dependency and source tree for regression shards
+        run: |
+          tar -czf "$RUNNER_TEMP/workspace.tar.gz" \
+            --exclude='./.git' --exclude='./.pnpm-store' --exclude='./.cache' \
+            --exclude='./.artifacts' --exclude='./.env' --exclude='./.env.*' .
+          sha256sum "$RUNNER_TEMP/workspace.tar.gz" > "$RUNNER_TEMP/workspace.sha256"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: regression-workspace
+          path: |
+            ${{ runner.temp }}/workspace.tar.gz
+            ${{ runner.temp }}/workspace.sha256
+          compression-level: 0
+          retention-days: 3
+
+  regression:
+    name: Full unit regression (${{ matrix.shard }}/4)
+    needs: container
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global pnpm@12.8.1
+      - uses: actions/download-artifact@v8
+        with:
+          name: regression-workspace
+          path: ${{ runner.temp }}/workspace
+      - name: Restore the just-built workspace, preserving executability and links
+        run: |
+          cd "$RUNNER_TEMP/workspace"
+          expected="$(cut -d ' ' -f1 workspace.sha256)"
+          echo "$expected  workspace.tar.gz" | sha256sum --check
+          tar --no-same-owner -xzf workspace.tar.gz -C "$GITHUB_WORKSPACE"
+      - name: Run every unit test through the supported pnpm launcher
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/tests"
+          pnpm exec vitest run --maxWorkers=2 --shard="$SHARD/4" \
+            --reporter=default --reporter=json --outputFile="$RUNNER_TEMP/tests/result.json" \
+            > "$RUNNER_TEMP/tests/test.log" 2>&1 || { tail -100 "$RUNNER_TEMP/tests/test.log"; exit 1; }
+          tail -20 "$RUNNER_TEMP/tests/test.log"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: full-regression-${{ matrix.shard }}
+          path: ${{ runner.temp }}/tests/
+          retention-days: 14
+
+  acceptance:
+    name: Development acceptance
+    needs: [container, regression]
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Require both the development environment and full unit regression
+        env:
+          CONTAINER_RESULT: ${{ needs.container.result }}
+          REGRESSION_RESULT: ${{ needs.regression.result }}
+        run: |
+          printf 'Development container: %s\nFull unit regression: %s\n' "$CONTAINER_RESULT" "$REGRESSION_RESULT" | tee -a "$GITHUB_STEP_SUMMARY"
+          test "$CONTAINER_RESULT" = success
+          test "$REGRESSION_RESULT" = success
