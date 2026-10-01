@@ -31,6 +31,7 @@ jobs:
         run: |
           npm install --global pnpm@12.8.1
           echo "PNPM_CONFIG_STORE_DIR=$GITHUB_WORKSPACE/.pnpm-store" >> "$GITHUB_ENV"
+          echo "XDG_CACHE_HOME=$RUNNER_TEMP/portable-cache" >> "$GITHUB_ENV"
       - uses: actions/download-artifact@v4
         with:
           name: dsh930-package-store
@@ -51,8 +52,8 @@ jobs:
           tar -xzf "$RUNNER_TEMP/store/package-store.tar.gz"
           tar -xzf "$RUNNER_TEMP/checkpoint/package-cache-delta.tar.gz"
           cp "$RUNNER_TEMP/checkpoint/package-index.db" .pnpm-store/v11/index.db
-          mkdir -p "$HOME/.cache/pnpm" "$RUNNER_TEMP/results"
-          tar -xzf "$RUNNER_TEMP/checkpoint/pnpm-metadata.tar.gz" -C "$HOME/.cache/pnpm"
+          mkdir -p "$XDG_CACHE_HOME/pnpm" "$RUNNER_TEMP/results"
+          tar -xzf "$RUNNER_TEMP/checkpoint/pnpm-metadata.tar.gz" -C "$XDG_CACHE_HOME/pnpm"
           find .pnpm-store/v11/files -type f | sort > "$RUNNER_TEMP/before.txt"
       - name: Verify frozen lockfile and install with all security policies enabled
         run: |
@@ -63,12 +64,11 @@ jobs:
           pnpm --dir "$RUNNER_TEMP/offline-rehearsal" install --offline --frozen-lockfile > "$RUNNER_TEMP/results/offline-install.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/offline-install.log"; exit 1; }
           node --version > "$RUNNER_TEMP/results/node-version.txt"
           pnpm --version > "$RUNNER_TEMP/results/pnpm-version.txt"
-      - name: Export all metadata formats and any missing package files
+      - name: Export complete portable cache and any missing package files
         run: |
           set -euo pipefail
-          test -d "$HOME/.cache/pnpm/v11/metadata-full-filtered"
-          find "$HOME/.cache/pnpm/v11" -maxdepth 2 -type d > "$RUNNER_TEMP/results/cache-layout.txt"
-          tar -czf "$RUNNER_TEMP/metadata-full.tar.gz" -C "$HOME/.cache/pnpm" v11
+          find "$XDG_CACHE_HOME/pnpm" -maxdepth 3 -type d > "$RUNNER_TEMP/results/cache-layout.txt"
+          tar -czf "$RUNNER_TEMP/metadata-full.tar.gz" -C "$XDG_CACHE_HOME/pnpm" .
           mkdir -p "$RUNNER_TEMP/parts"
           split -b 240M -d "$RUNNER_TEMP/metadata-full.tar.gz" "$RUNNER_TEMP/parts/metadata.part-"
           (cd "$RUNNER_TEMP/parts"; sha256sum metadata.part-*) > "$RUNNER_TEMP/results/metadata-parts.sha256"
