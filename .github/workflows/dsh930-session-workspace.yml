@@ -1,0 +1,64 @@
+name: dsh930 restore verified session workspace
+
+on:
+  push:
+    branches: [ops/artifact-transfer]
+    paths: [.github/workflows/dsh930-session-workspace.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          name: regression-workspace
+          run-id: 36856990975
+          github-token: ${{ github.token }}
+          repository: wmqfl861/dsh930
+          path: ${{ runner.temp }}/input
+      - name: Verify the archive and split without changing its contents
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/input"
+          expected="$(awk 'NR == 1 {print $1}' workspace.sha256)"
+          test "${#expected}" -eq 64
+          printf '%s  workspace.tar.gz\n' "$expected" | sha256sum --check -
+          mkdir -p "$RUNNER_TEMP/output"
+          split -b 240M -d workspace.tar.gz "$RUNNER_TEMP/output/workspace.part-"
+          cp workspace.sha256 "$RUNNER_TEMP/output/original-sha256.txt"
+          cd "$RUNNER_TEMP/output"
+          sha256sum workspace.part-* > SHA256SUMS
+          printf '%s\n' 7a83cb480fb61a98483cb8c79a37388295a45237 > source-commit.txt
+          test "$(find . -name 'workspace.part-*' | wc -l)" -eq 3
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dsh930-main-session-00
+          path: ${{ runner.temp }}/output/workspace.part-00
+          compression-level: 0
+          retention-days: 7
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dsh930-main-session-01
+          path: ${{ runner.temp }}/output/workspace.part-01
+          compression-level: 0
+          retention-days: 7
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dsh930-main-session-02
+          path: ${{ runner.temp }}/output/workspace.part-02
+          compression-level: 0
+          retention-days: 7
+      - uses: actions/upload-artifact@v7
+        with:
+          name: dsh930-main-session-checksums
+          path: |
+            ${{ runner.temp }}/output/SHA256SUMS
+            ${{ runner.temp }}/output/original-sha256.txt
+            ${{ runner.temp }}/output/source-commit.txt
+          retention-days: 7
