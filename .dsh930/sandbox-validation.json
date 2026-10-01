@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-01T09:18:48.408932+00:00",
+  "sourceCommit": "0dc80141c8b55432fa2dfb01ad6f9fd64b51e152",
+  "repository": "wmqfl861/dsh930",
+  "branch": "dev/node24",
+  "sandbox": {
+    "root": "/mnt/data/workspaces/deepseek-harness",
+    "activation": "source /mnt/data/workspaces/activate-dsh930.sh",
+    "node": "v24.21.0",
+    "pnpm": "12.8.1",
+    "memoryLimitBytes": 4294967296,
+    "trackedFiles": 14116,
+    "workspaceProjects": 339,
+    "offlineInstall": {
+      "command": "pnpm install --offline --frozen-lockfile",
+      "exitCode": 0,
+      "reusedPackages": 1382,
+      "downloadedPackages": 0,
+      "securityPoliciesDisabled": false
+    },
+    "focusedTests": {
+      "command": "vitest run (8 affected test files) --maxWorkers=1",
+      "passed": 166,
+      "failed": 0,
+      "pending": 0
+    },
+    "webSmoke": {
+      "node": "v24.21.0",
+      "anonymousStatus": 401,
+      "tokenExchangeStatus": 303,
+      "authenticatedStatus": 200,
+      "authenticationEnforced": true,
+      "modelApiCalls": 0
+    },
+    "fullBuild": {
+      "command": "pnpm run build",
+      "status": "blocked-by-sandbox-memory-limit",
+      "subprocessExitCode": 137,
+      "evidence": "cgroup memory.events reports oom_kill=1"
+    },
+    "fullLint": {
+      "command": "pnpm run lint:contracts-ready",
+      "status": "native-tool-crash",
+      "exitCode": 134,
+      "singleWorkerRetryExitCode": 134,
+      "error": "oxc_allocator fixed_size.rs pool allocation panic; no lint result produced"
+    }
+  },
+  "githubActions": {
+    "developmentValidationRun": 36815842580,
+    "install": "success",
+    "cleanBuild": "success",
+    "focusedTestsPassed": 166,
+    "lint": "success",
+    "authenticatedWebSmoke": "success",
+    "portableOfflineCacheRun": 36841096248,
+    "freshCheckoutOfflineInstall": "success"
+  },
+  "dependencyUpgrade": {
+    "changedDeclarations": 354,
+    "changedPackages": 80,
+    "changedManifests": 108,
+    "deferredPackages": 48,
+    "scope": "Compatible registry updates within declared ranges; ordinary exact pins move within the same compatible release line and remain exact. Node and pnpm are explicitly migrated. Major/API-breaking upgrades and patched/native groups require separate validation.",
+    "allLatest": false
+  },
+  "fullRegression": {
+    "status": "not-green",
+    "earlierBaselineRun": 36813104476,
+    "passed": 38724,
+    "failed": 23,
+    "pending": 187,
+    "additionalSuiteInitializationErrors": true,
+    "rerunAfterRepair": false
+  },
+  "capabilities": {
+    "sourceEditing": true,
+    "offlineDependencyInstall": true,
+    "focusedTests": true,
+    "webStartup": true,
+    "fullBuildInSandbox": false,
+    "fullLintInSandbox": false,
+    "fullBuildInGitHubActions": true,
+    "productionReady": false
+  },
+  "evidenceSha256": {
+    "install.log": "bf9fb391088adbb7dfc10488860a27a1eb7dc8e5d9bf361b3c04f455969300f0",
+    "build.log": "be5e35a0d9aacf9b6f07adb0ffb9c9fc5250a44745dfc3a39ffabecc9e3c5675",
+    "focused.json": "8f121f116e4c29f58d2eaed1eef880908bdb1e51dda55067087d78d79a172b99",
+    "focused.log": "7003677b1e4f93804feab7352a423def910ae60ede781aa0c69594a196f6e157",
+    "smoke.log": "a13c23f7f5d21cfd37c28a903257089c4637c9893d076a98ee08e7f8752f692c",
+    "lint.log": "ddc695f559c1a7e0f7e135862287e45134c2f3697dd472ed54512dcae36242c2"
+  }
+}
