@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "repository": "wmqfl861/dsh930",
+  "sourceCommit": "7a83cb480fb61a98483cb8c79a37388295a45237",
+  "sourceTree": "3c8882942dbaac48ee6606c73db413708a94ebab",
+  "trackedFiles": 14125,
+  "mainPromotion": {
+    "from": "6e17ffbe4d14eeea6ae3f9d15f69c65262d726b3",
+    "to": "7a83cb480fb61a98483cb8c79a37388295a45237",
+    "method": "fast-forward, force=false",
+    "result": "success"
+  },
+  "developmentBranch": "dev/cloud-ready",
+  "node": "v24.21.0",
+  "pnpm": "12.8.1",
+  "lockfileSha256": "66065a61e12a89c9d4c82d86323fca613796bb72cadd878db89325dbfa464b95",
+  "validationRun": {
+    "id": 36856990975,
+    "url": "https://github.com/wmqfl861/dsh930/actions/runs/36856990975",
+    "headSha": "7a83cb480fb61a98483cb8c79a37388295a45237",
+    "status": "completed",
+    "conclusion": "success",
+    "completedAt": "2026-10-01T11:58:21Z"
+  },
+  "environment": {
+    "definition": ".devcontainer/devcontainer.json",
+    "dockerfile": ".devcontainer/Dockerfile",
+    "imageBase": "node:24.21.0-bookworm",
+    "runner": "GitHub Actions ubuntu-24.04",
+    "codespacesHostRequirements": { "cpus": 4, "memory": "16gb", "storage": "32gb" },
+    "setupCommand": "bash .devcontainer/setup.sh",
+    "startCommand": "bash .devcontainer/start.sh",
+    "existingNodeModulesReusedForColdSetup": false,
+    "workspaceProjects": 339,
+    "frozenInstall": "passed",
+    "supplyChainPolicyChecksDisabled": false,
+    "completeNativeBuild": "passed",
+    "cleanHostClientWebBuild": "passed",
+    "lint": { "errors": 0, "warnings": 0, "files": 5094 },
+    "trackedSourceAndLockfileUnchangedBySetup": true,
+    "configurationTests": { "passed": 8, "failed": 0 },
+    "focusedTests": { "files": 10, "passed": 197, "failed": 0 },
+    "authenticatedWeb": { "anonymousStatus": 401, "tokenExchangeStatus": 303, "authenticatedStatus": 200 },
+    "liveSourceEdit": { "rebuiltAndServed": true, "restoredAndServed": true, "authenticationEnforced": true },
+    "modelApiCalls": 0
+  },
+  "fullLinuxUnitRegression": {
+    "command": "pnpm exec vitest run --maxWorkers=2 --shard=N/4",
+    "passed": 39152,
+    "failed": 0,
+    "pendingOrSkipped": 183,
+    "todo": 0,
+    "total": 39335,
+    "failedSuiteInitialization": 0,
+    "shards": [
+      { "shard": 1, "passed": 8121, "failed": 0, "pending": 74, "success": true },
+      { "shard": 2, "passed": 8858, "failed": 0, "pending": 50, "success": true },
+      { "shard": 3, "passed": 14226, "failed": 0, "pending": 37, "success": true },
+      { "shard": 4, "passed": 7947, "failed": 0, "pending": 22, "success": true }
+    ],
+    "pendingCountedAsPassed": false,
+    "newSkipsAddedToHideFailures": false
+  },
+  "artifacts": [
+    { "name": "development-container-results", "id": 11159605728, "sha256": "1bb1cf829e9d7168140d242b420a4ec8b0838f9474495b2e7c9c6850da3b2136" },
+    { "name": "full-regression-1", "id": 11161080353, "sha256": "049e20a9753f4b516b30bc08ee039078fc8769c73ab1ccba987dfb4278453190" },
+    { "name": "full-regression-2", "id": 11160316790, "sha256": "edfe15f73db3eb11f8082f2235bfcaf8a53c755176c8cf3ddbeba800325bfc8d" },
+    { "name": "full-regression-3", "id": 11160416770, "sha256": "36bfd36f439d4ab5d599219ee798a8102928e6f45622c91f7f27158797928e35" },
+    { "name": "full-regression-4", "id": 11160755475, "sha256": "96863356fe9315b0b4613b6e1859d90d64a325e86a6b403a30e508a5f22e3fec" }
+  ],
+  "scope": {
+    "linuxWebDevelopmentBaselineAccepted": true,
+    "codespaceProvisionedByAssistant": false,
+    "codespaceAccountLifecycleTested": false,
+    "userActionRequired": "Create a Codespace from main or dev/cloud-ready in your own GitHub account; after setup reports success run bash .devcontainer/start.sh.",
+    "nativeWindowsMacDesktopTested": false,
+    "realModelApiTested": false,
+    "separateSnapshotE2ECoverageGatesRun": false,
+    "productionReadyClaimed": false,
+    "allDependenciesLatest": false,
+    "dependencyPolicy": "Freeze the tested lockfile; patched/native and unrelated major upgrades remain separate."
+  },
+  "historicalReports": "Earlier .dsh930/validation.json and sandbox-validation.json describe earlier commits; they are not the current acceptance result."
+}
