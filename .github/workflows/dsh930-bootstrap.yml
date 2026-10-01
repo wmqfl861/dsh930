@@ -45,7 +45,7 @@ jobs:
           git archive --format=tar "$UPSTREAM_COMMIT" | gzip > "$RUNNER_TEMP/dsh930-export/upstream-source.tar.gz"
           git switch -c dev/node24
           git archive "$UPSTREAM_COMMIT" | tar -x
-          # Retain upstream automation byte-for-byte, without running release jobs
+          # Keep upstream automation byte-for-byte without running release jobs
           # or queues requiring DeepSeek's private runners in this new repository.
           mkdir -p .github/upstream-workflows
           find .github/workflows -maxdepth 1 -type f ! -name dsh930-bootstrap.yml -exec mv -t .github/upstream-workflows {} +
@@ -69,12 +69,15 @@ jobs:
           git config user.name 'dsh930 setup'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add --all
-          git diff --cached --check
+          # Imported vendor/cosmokit/README.md already has trailing whitespace.
+          # Preserve the upstream bytes and check only newly authored setup files.
+          git diff --cached --check -- .github/workflows/dsh930-bootstrap.yml .dsh930 .nvmrc .node-version
           git -c core.hooksPath=/dev/null commit -m "chore: import upstream 639ed015 and select Node 24"
           git push origin HEAD:refs/heads/dev/node24
           git archive --format=tar HEAD | gzip > "$RUNNER_TEMP/dsh930-export/dsh930-source.tar.gz"
           git rev-parse HEAD > "$RUNNER_TEMP/dsh930-export/commit.txt"
       - name: Export the actual Node 24 runtime
+        if: always()
         shell: bash
         run: |
           set -euo pipefail
