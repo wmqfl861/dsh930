@@ -29,6 +29,9 @@ peerDependencyRules:
 # default and only allow scripts we need. esbuild (native binary) and lefthook
 # (git hooks) genuinely need theirs.
 allowBuilds:
+  # Reviewed 12.8.1 install.js links its installed platform binary and refreshes
+  # npm shims on Windows. The approval is limited to this exact version.
+  'pnpm@12.8.1': true
   esbuild: true
   lefthook: true
   # Cross-platform boundary for the persistent PTY backend, including ConPTY on Windows.
