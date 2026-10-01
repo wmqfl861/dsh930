@@ -1,0 +1,145 @@
+--- a/pnpm-workspace.yaml
++++ b/pnpm-workspace.yaml
+@@ -15,6 +15,8 @@
+   - python/sdk-runtime
+ 
+ overrides:
++  # Stagehand and Harness exchange Zod types, which carry their minor version.
++  'zod@^4': '4.6.5'
+   'extract-zip>yauzl': '3.4.0'
+   '@deepseek-ai/cosmokit': 'link:vendor/cosmokit'
+   '@deepseek-ai/schemastery': 'link:vendor/schemastery'
+--- a/packages/experimental/webworker-runtime/src/node/builtin_modules/implemented/os.ts
++++ b/packages/experimental/webworker-runtime/src/node/builtin_modules/implemented/os.ts
+@@ -46,7 +46,7 @@
+  * CPU architecture.
+  * @returns always 'x64'.
+  */
+-export function arch(): string {
++export function arch(): NodeJS.Architecture {
+   return 'x64'
+ }
+ 
+--- a/packages/fs/fs-local/tests/fsio.spec.ts
++++ b/packages/fs/fs-local/tests/fsio.spec.ts
+@@ -477,7 +477,7 @@
+             read: handle.read.bind(handle),
+             async stat(...statArgs: Parameters<typeof handle.stat>) {
+               const info = await handle.stat(...statArgs)
+-              return Object.assign(info, { isFile: () => false })
++              return info === undefined ? undefined : Object.assign(info, { isFile: () => false })
+             },
+           }
+         },
+--- a/scripts/tests/ci-release-selfhosted.spec.ts
++++ b/scripts/tests/ci-release-selfhosted.spec.ts
+@@ -1,3 +1,4 @@
++/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
+ /** Release rehearsal routing and persistent-runner isolation, without executing release builds. */
+ import { readFileSync } from 'node:fs'
+ import { resolve } from 'node:path'
+@@ -25,7 +26,7 @@
+ }
+ 
+ function workflow(file: string): Workflow {
+-  return load(readFileSync(resolve(root, '.github/workflows', file), 'utf8')) as Workflow
++  return load(readFileSync(resolve(root, '.github/upstream-workflows', file), 'utf8')) as Workflow
+ }
+ 
+ // This canonical-case corpus has matching Actions/JavaScript comparison results.
+--- a/scripts/tests/ci-master-platforms.spec.ts
++++ b/scripts/tests/ci-master-platforms.spec.ts
+@@ -1,3 +1,4 @@
++/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
+ /** Scheduling policy for post-merge native runtime carriers and Wine. */
+ import { readFileSync } from 'node:fs'
+ import { resolve } from 'node:path'
+@@ -28,7 +29,7 @@
+ }
+ 
+ function workflow(name: string): Workflow {
+-  return load(readFileSync(resolve(root, '.github/workflows', name), 'utf8')) as Workflow
++  return load(readFileSync(resolve(root, '.github/upstream-workflows', name), 'utf8')) as Workflow
+ }
+ 
+ function commands(job: Job): string[] {
+--- a/scripts/ci-compatible-selfhosted.spec.ts
++++ b/scripts/ci-compatible-selfhosted.spec.ts
+@@ -1,3 +1,4 @@
++/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
+ import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
+ import { tmpdir } from 'node:os'
+ import { join, resolve } from 'node:path'
+@@ -23,7 +24,7 @@
+   steps: Step[]
+ }
+ 
+-const workflow = yaml.load(readFileSync(resolve(import.meta.dirname, '../.github/workflows/ci.yml'), 'utf8')) as {
++const workflow = yaml.load(readFileSync(resolve(import.meta.dirname, '../.github/upstream-workflows/ci.yml'), 'utf8')) as {
+   jobs: { 'node-compat': CompatibilityJob; 'python-sdk': { 'runs-on': string } }
+ }
+ const job = workflow.jobs['node-compat']
+--- a/scripts/preview-workflow.spec.ts
++++ b/scripts/preview-workflow.spec.ts
+@@ -1,9 +1,10 @@
++/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
+ import { readFileSync } from 'node:fs'
+ import { resolve } from 'node:path'
+ import * as yaml from 'js-yaml'
+ import { describe, expect, it } from 'vitest'
+ 
+-const workflow = yaml.load(readFileSync(resolve(import.meta.dirname, '../.github/workflows/build-preview-cloudflare.yml'), 'utf8')) as {
++const workflow = yaml.load(readFileSync(resolve(import.meta.dirname, '../.github/upstream-workflows/build-preview-cloudflare.yml'), 'utf8')) as {
+   on: unknown
+   permissions: unknown
+   concurrency: unknown
+--- a/scripts/client-build-environment.client.spec.ts
++++ b/scripts/client-build-environment.client.spec.ts
+@@ -1,3 +1,4 @@
++/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
+ import { execFileSync } from 'node:child_process'
+ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+ import { tmpdir } from 'node:os'
+@@ -283,7 +284,7 @@
+ 
+   it('keeps public client values out of workflow-wide environments', () => {
+     for (const name of dshBuildWorkflows) {
+-      const path = `.github/workflows/${name}`
++      const path = `.github/upstream-workflows/${name}`
+       const document: unknown = yaml.load(readFileSync(resolve(root, path), 'utf8'))
+       if (typeof document !== 'object' || document === null || Array.isArray(document)) {
+         throw new TypeError(`${path} must contain a workflow object`)
+--- a/scripts/ci-workflow.spec.ts
++++ b/scripts/ci-workflow.spec.ts
+@@ -1,3 +1,4 @@
++/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
+ import { readFileSync } from 'node:fs'
+ import { resolve } from 'node:path'
+ import { runInNewContext } from 'node:vm'
+@@ -66,7 +67,7 @@
+     const files = ['.github/workflows/ci.yml', '.github/workflows/ci-master.yml']
+     const setups: Array<{ jobName: string; step: unknown }> = []
+     for (const file of files) {
+-      const workflow: unknown = yaml.load(readFileSync(resolve(root, file), 'utf8'))
++      const workflow: unknown = yaml.load(readFileSync(resolve(root, file.replace('.github/workflows/', '.github/upstream-workflows/')), 'utf8'))
+       if (!isRecord(workflow) || !isRecord(workflow.jobs)) throw new TypeError(`${file} must define jobs`)
+       for (const [jobName, job] of Object.entries(workflow.jobs)) {
+         if (!isRecord(job) || !Array.isArray(job.steps)) continue
+@@ -130,7 +131,7 @@
+   )
+ 
+   it('isolates the python SDK exe pnpm setup destination per job', () => {
+-    const workflow: unknown = yaml.load(readFileSync(resolve(root, '.github/workflows/build-exe-for-python-sdk.yml'), 'utf8'))
++    const workflow: unknown = yaml.load(readFileSync(resolve(root, '.github/upstream-workflows/build-exe-for-python-sdk.yml'), 'utf8'))
+     if (!isRecord(workflow) || !isRecord(workflow.jobs)) throw new TypeError('build-exe-for-python-sdk.yml must define jobs')
+     const setups: Array<{ step: unknown }> = []
+     for (const job of Object.values(workflow.jobs)) {
+@@ -1227,7 +1228,7 @@
+ })
+ 
+ function loadWorkflow(path: string): Record<string, unknown> {
+-  const workflow: unknown = yaml.load(readFileSync(resolve(root, path), 'utf8'))
++  const workflow: unknown = yaml.load(readFileSync(resolve(root, path.replace('.github/workflows/', '.github/upstream-workflows/')), 'utf8'))
+   if (!isRecord(workflow)) throw new TypeError(`${path} must define a workflow`)
+   return workflow
+ }
