@@ -25,7 +25,7 @@
   "devDependencies": {
     "@deepseek-ai/cordis": "workspace:~",
     "@deepseek-ai/dsh-client-store": "workspace:*",
-    "@types/react": "~18.3.31"
+    "@types/react": "~19.2.18"
   },
   "files": [
     "lib/index.js",
