@@ -67,7 +67,9 @@ export const __esModule = true
 type NodeFace = Partial<Omit<typeof import('node:url'), 'URL' | 'URLSearchParams'>>
   & Record<'URL' | 'URLSearchParams', unknown>
 
-/** CommonJS default export: the members `require()` hands a caller of this module. */
-export default {
+const urlModule = {
   fileURLToPath, pathToFileURL, resolve, URL: UrlClass, URLSearchParams: UrlSearchParamsClass,
-} satisfies NodeFace
+}
+
+/** CommonJS default export: the members `require()` hands a caller of this module. */
+export default urlModule satisfies NodeFace

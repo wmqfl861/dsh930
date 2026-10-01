@@ -2774,5 +2774,11 @@
       ]
     }
   ],
-  "scope": "Compatible registry updates within declared ranges; ordinary exact pins move within the same compatible release line and remain exact. Node and pnpm are explicitly migrated. Major/API-breaking upgrades and patched/native groups require separate validation."
+  "scope": "Compatible registry updates within declared ranges; ordinary exact pins move within the same compatible release line and remain exact. Node and pnpm are explicitly migrated. Major/API-breaking upgrades and patched/native groups require separate validation.",
+  "followup": {
+    "runId": "36815842580",
+    "coordinatedUpgrade": "OpenTelemetry SDK/logs 0.222.x aligned with core/resources 2.11.x; explicit delegate metrics with no ambient MeterProvider",
+    "sourceChanges": "Node 24 types, Fast-check timeout plugin, lint declarations and OTLP delegate argument migration",
+    "fullSuite": "See validation.json; not claimed green"
+  }
 }
