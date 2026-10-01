@@ -26,8 +26,19 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/transfer"
           gh api "repos/wmqfl861/dsh930/contents/.dsh930/cloud-baseline.patch.gz.b64?ref=$GITHUB_SHA" --jq .content | base64 -d > "$RUNNER_TEMP/transfer/payload.b64"
-          base64 -d "$RUNNER_TEMP/transfer/payload.b64" | gzip -dc > "$RUNNER_TEMP/transfer/cloud-baseline.patch"
-          echo 'ca6e3914d9c1ac49a416a7c247ae0ff6dc8d8e1ef9a653b6a2f01676465e8860  cloud-baseline.patch' | (cd "$RUNNER_TEMP/transfer"; sha256sum --check)
+          python3 - <<'PY'
+          import os, pathlib, hashlib, base64, gzip
+          root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'transfer'
+          text = (root / 'payload.b64').read_text().strip()
+          assert hashlib.sha256(text.encode()).hexdigest() == '256acb869b1f41121efcb023efa52bc04788e7f44df316d28dad223e9831fcd9'
+          # Repair only the four known transcription errors, from right to left.
+          for start, end, replacement in [(13017, 13017, 'V'), (12175, 12176, ''), (10980, 10981, ''), (8922, 8923, '')]:
+              text = text[:start] + replacement + text[end:]
+          assert hashlib.sha256(text.encode()).hexdigest() == 'fc9127c3696bce45c11ca5976cbe2456617db478d94743f96ae9dd365b240545'
+          patch = gzip.decompress(base64.b64decode(text, validate=True))
+          assert hashlib.sha256(patch).hexdigest() == 'ca6e3914d9c1ac49a416a7c247ae0ff6dc8d8e1ef9a653b6a2f01676465e8860'
+          (root / 'cloud-baseline.patch').write_bytes(patch)
+          PY
       - name: Apply, review and create a candidate commit
         run: |
           set -euo pipefail
