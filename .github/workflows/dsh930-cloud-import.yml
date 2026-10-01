@@ -1,0 +1,59 @@
+name: dsh930 import cloud development baseline
+
+on:
+  push:
+    branches: [ops/artifact-transfer]
+    paths: [.github/workflows/dsh930-cloud-import.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: b060911e1deb03aadf317ed4eb44227ab9d6d544
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Read and verify the reviewed patch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/transfer"
+          gh api "repos/wmqfl861/dsh930/contents/.dsh930/cloud-baseline.patch.gz.b64?ref=$GITHUB_SHA" --jq .content | base64 -d > "$RUNNER_TEMP/transfer/payload.b64"
+          base64 -d "$RUNNER_TEMP/transfer/payload.b64" | gzip -dc > "$RUNNER_TEMP/transfer/cloud-baseline.patch"
+          echo 'ca6e3914d9c1ac49a416a7c247ae0ff6dc8d8e1ef9a653b6a2f01676465e8860  cloud-baseline.patch' | (cd "$RUNNER_TEMP/transfer"; sha256sum --check)
+      - name: Apply, review and create a candidate commit
+        run: |
+          set -euo pipefail
+          git apply --check "$RUNNER_TEMP/transfer/cloud-baseline.patch"
+          git apply "$RUNNER_TEMP/transfer/cloud-baseline.patch"
+          git add --all
+          git diff --cached --check
+          git config user.name 'dsh930 setup'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'build: freeze Node 24 cloud environment and repair development test prerequisites'
+          git rev-parse HEAD > "$RUNNER_TEMP/transfer/commit.txt"
+          git bundle create "$RUNNER_TEMP/transfer/candidate.bundle" HEAD
+      - name: Publish a new staging branch, never overwrite an existing branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh api 'repos/wmqfl861/dsh930/git/ref/heads/staging/cloud-ready' >/dev/null 2>&1; then
+            echo 'staging/cloud-ready already exists; refusing to replace it' >&2
+            exit 1
+          fi
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push origin HEAD:refs/heads/staging/cloud-ready
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: cloud-baseline-transfer
+          path: ${{ runner.temp }}/transfer/
+          retention-days: 7
