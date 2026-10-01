@@ -1,0 +1,111 @@
+name: dsh930 pnpm 12 regression repair
+
+on:
+  push:
+    branches: [ops/artifact-transfer]
+    paths: [.github/workflows/dsh930-regression-repair.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+env:
+  CI: 'true'
+  DSH_TELEMETRY_DISABLED: '1'
+  NODE_OPTIONS: --max-old-space-size=6144
+
+jobs:
+  repair:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 787f1ae6323eeb4d21e701ae52730adf1ab0e7da
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm install --global pnpm@12.8.1
+      - uses: actions/download-artifact@v8
+        with:
+          name: regression-workspace
+          run-id: 36853567279
+          github-token: ${{ github.token }}
+          repository: wmqfl861/dsh930
+          path: ${{ runner.temp }}/workspace
+      - name: Restore the exact previously verified build
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/workspace"
+          expected="$(cut -d ' ' -f1 workspace.sha256)"
+          echo "$expected  workspace.tar.gz" | sha256sum --check
+          tar --no-same-owner -xzf workspace.tar.gz -C "$GITHUB_WORKSPACE"
+      - name: Verify and apply only the reviewed repairs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/results"
+          gh api "repos/wmqfl861/dsh930/contents/.dsh930/pnpm12-regression-repair.b64?ref=$GITHUB_SHA" --jq .content | base64 -d > "$RUNNER_TEMP/results/payload.b64"
+          base64 -d "$RUNNER_TEMP/results/payload.b64" | gzip -dc > "$RUNNER_TEMP/results/repair.patch"
+          echo '17a8f1d9a68913bf6bc8fbbc3a93ec65f65ffb5b6b1075fa9ca2dd5d80976ad2  repair.patch' | (cd "$RUNNER_TEMP/results"; sha256sum --check)
+          git apply --check "$RUNNER_TEMP/results/repair.patch"
+          git apply "$RUNNER_TEMP/results/repair.patch"
+          python3 - <<'PY'
+          from pathlib import Path
+          root = Path('packages/boot/plugin-manager')
+          p = root / 'README.md'
+          text = p.read_text()
+          text = text.replace('Authentication, repository lookup and other failures are left to pnpm, including its HTTPS-to-SSH fallback.', 'Authentication, repository lookup and other failures are left to pnpm; pnpm 12 uses explicit Git URL rewriting for SSH access.')
+          text = text.replace('When pnpm 11 blocks dependency scripts,', 'When pnpm blocks dependency scripts,')
+          text = text.replace('where pnpm records them.', "where pnpm 11 records placeholders. pnpm 12 records exact pending selectors in `node_modules/.modules.yaml`; its recorded approval policy must still match the current profile policy before those selectors are offered. A policy change requires another installation to refresh the list.")
+          p.write_text(text)
+          p = root / 'README.zh.md'
+          text = p.read_text().replace('认证、仓库查找及其他失败继续交给 pnpm，包括其 HTTPS 到 SSH 的回退。', '认证、仓库查找及其他失败继续交给 pnpm；pnpm 12 将托管仓库依赖统一为 HTTPS 标识，SSH 访问需要通过 Git 的 `url.*.insteadOf` 显式配置。')
+          text = text.replace('pnpm 11 拦下依赖脚本时，', 'pnpm 拦下依赖脚本时，')
+          text = text.replace('但有意不恢复 pnpm 记录这些名字的 `pnpm-workspace.yaml`。', '但有意保留 pnpm 11 记录占位值的 `pnpm-workspace.yaml`。pnpm 12 将精确的待批准选择器记录在 `node_modules/.modules.yaml`；只有该文件保存的批准策略与当前 profile 策略一致时，才提供这些选择器。策略变更后需要重新安装以刷新列表。')
+          p.write_text(text)
+          PY
+          git diff --check
+      - name: Run affected real installations and snapshot coverage
+        run: |
+          pnpm exec vitest run packages/boot/plugin-manager/tests/build-approval.spec.ts packages/boot/plugin-manager/tests/manager.spec.ts packages/typert/generator/tests/type-model.spec.ts --maxWorkers=2 --reporter=default --reporter=json --outputFile="$RUNNER_TEMP/results/tests.json" > "$RUNNER_TEMP/results/tests.log" 2>&1 || { tail -160 "$RUNNER_TEMP/results/tests.log"; exit 1; }
+          tail -25 "$RUNNER_TEMP/results/tests.log"
+      - name: Typecheck the changed Host package and check its lint
+        run: |
+          pnpm exec tsc -b packages/boot/plugin-manager/tsconfig.json > "$RUNNER_TEMP/results/typecheck.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/typecheck.log"; exit 1; }
+          pnpm exec tsx scripts/run-oxlint.ts packages/boot/plugin-manager > "$RUNNER_TEMP/results/lint.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/lint.log"; exit 1; }
+      - name: Save the repaired candidate without overwriting any branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git diff --exit-code -- pnpm-lock.yaml package.json pnpm-workspace.yaml
+          git add packages/boot/plugin-manager packages/typert/generator/tests/__snapshots__/type-model.spec.ts.snap
+          git diff --cached --check
+          git config user.name 'dsh930 setup'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'fix: migrate pending build approvals and private Git fixtures to pnpm 12'
+          if gh api repos/wmqfl861/dsh930/git/ref/heads/staging/cloud-repaired >/dev/null 2>&1; then
+            echo 'staging/cloud-repaired already exists; refusing replacement' >&2
+            exit 1
+          fi
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push origin HEAD:refs/heads/staging/cloud-repaired
+          git rev-parse HEAD > "$RUNNER_TEMP/results/commit.txt"
+          git bundle create "$RUNNER_TEMP/results/candidate.bundle" HEAD
+      - name: Preserve exact changes and diagnostics
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/results"
+          git diff --binary > "$RUNNER_TEMP/results/uncommitted.patch"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: pnpm12-regression-repair
+          path: ${{ runner.temp }}/results/
+          retention-days: 14
