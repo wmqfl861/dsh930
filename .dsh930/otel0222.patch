@@ -1,0 +1,45 @@
+--- a/packages/telemetry/otel/src/transport.ts
++++ b/packages/telemetry/otel/src/transport.ts
+@@ -1,7 +1,7 @@
+ /** Explicit OTLP JSON transport for feedback-authorized Session logs. */
+ import { createOtlpHttpExportDelegate, getSharedConfigurationFromEnvironment, httpAgentFactoryFromOptions } from '@opentelemetry/otlp-exporter-base/node-http'
+ import { getSharedConfigurationDefaults, mergeOtlpSharedConfigurationWithDefaults, OTLPExporterBase, type OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base'
+-import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer'
++import { JsonLogsSerializer, LogsExporterMetricsHelper } from '@opentelemetry/otlp-transformer'
+ import type { LogRecordExporter } from '@opentelemetry/sdk-logs'
+ 
+ /**
+@@ -10,7 +10,10 @@
+  * @returns the exporter owned by one independent log pipeline.
+  */
+ export function createLogExporter(options: OTLPExporterNodeConfigBase & { url: string }): LogRecordExporter {
+-  return new OTLPExporterBase(createOtlpHttpExportDelegate(logTransportOptions(options), JsonLogsSerializer))
++  // No MeterProvider is installed: collector-local exports must not inherit an ambient metrics pipeline.
++  return new OTLPExporterBase(createOtlpHttpExportDelegate(
++    logTransportOptions(options), JsonLogsSerializer, 'otlp_http_json_log_exporter', LogsExporterMetricsHelper, undefined,
++  ))
+ }
+ 
+ /**
+--- a/packages/telemetry/otel/src/event-transport.ts
++++ b/packages/telemetry/otel/src/event-transport.ts
+@@ -3,7 +3,8 @@
+ import { gzipSync } from 'node:zlib'
+ import got from 'got'
+ import { createOtlpNetworkExportDelegate, OTLPExporterBase, type OTLPExporterNodeConfigBase } from '@opentelemetry/otlp-exporter-base'
+-import { JsonLogsSerializer } from '@opentelemetry/otlp-transformer'
++import { createOtlpHttpExporterMetrics } from '@opentelemetry/otlp-exporter-base/node-http'
++import { JsonLogsSerializer, LogsExporterMetricsHelper } from '@opentelemetry/otlp-transformer'
+ import type { LogRecordExporter } from '@opentelemetry/sdk-logs'
+ import { logTransportOptions } from './transport.ts'
+ 
+@@ -16,7 +17,8 @@
+ export function createEventLogExporter(options: OTLPExporterNodeConfigBase & { url: string }, signal: AbortSignal): LogRecordExporter {
+   const config = logTransportOptions(options)
+   let agent: ReturnType<typeof config.agentFactory> | undefined
+-  const exporter = new OTLPExporterBase(createOtlpNetworkExportDelegate(config, JsonLogsSerializer, {
++  const metrics = createOtlpHttpExporterMetrics('otlp_http_json_log_exporter', LogsExporterMetricsHelper, config.url, undefined)
++  const exporter = new OTLPExporterBase(createOtlpNetworkExportDelegate(config, JsonLogsSerializer, metrics, {
+     async send(data, timeoutMillis) {
+       signal.throwIfAborted()
+       agent ??= config.agentFactory(new URL(config.url).protocol)
