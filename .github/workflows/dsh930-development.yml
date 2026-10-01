@@ -38,14 +38,7 @@ jobs:
             dsh930-dev bash .devcontainer/setup.sh
       - name: Verify tracked files were not rewritten by installation or build
         run: git diff --exit-code
-      - uses: actions/upload-artifact@v7
-        if: always()
-        with:
-          name: development-container-results
-          path: .artifacts/dsh930-development/
-          include-hidden-files: true
-          retention-days: 14
-      - name: Export the exact built dependency and source tree for regression shards
+      - name: Export the clean build before development watchers rewrite artifacts
         run: |
           tar -czf "$RUNNER_TEMP/workspace.tar.gz" \
             --exclude='./.git' --exclude='./.pnpm-store' --exclude='./.cache' \
@@ -59,6 +52,22 @@ jobs:
             ${{ runner.temp }}/workspace.sha256
           compression-level: 0
           retention-days: 3
+      - name: Verify source edit, rebuild, served resource and restoration
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp/dsh930-home -e CI=true \
+            -v "$PWD:/workspaces/dsh930" -w /workspaces/dsh930 \
+            dsh930-dev bash -c 'mkdir -p "$HOME"; node .devcontainer/watch-smoke.mjs' \
+            > .artifacts/dsh930-development/watch.log 2>&1 || { tail -120 .artifacts/dsh930-development/watch.log; exit 1; }
+          cat .artifacts/dsh930-development/watch.log
+          git diff --exit-code
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: development-container-results
+          path: .artifacts/dsh930-development/
+          include-hidden-files: true
+          retention-days: 14
 
   regression:
     name: Full unit regression (${{ matrix.shard }}/4)
