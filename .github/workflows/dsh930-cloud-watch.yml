@@ -1,0 +1,60 @@
+name: dsh930 actual development watch smoke
+
+on:
+  push:
+    branches: [ops/artifact-transfer]
+    paths: [.github/workflows/dsh930-cloud-watch.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  watch:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: 787f1ae6323eeb4d21e701ae52730adf1ab0e7da
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@v8
+        with:
+          name: regression-workspace
+          run-id: 36853567279
+          github-token: ${{ github.token }}
+          repository: wmqfl861/dsh930
+          path: ${{ runner.temp }}/workspace
+      - name: Restore the verified clean build
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/workspace"
+          expected="$(cut -d ' ' -f1 workspace.sha256)"
+          echo "$expected  workspace.tar.gz" | sha256sum --check
+          tar --no-same-owner -xzf workspace.tar.gz -C "$GITHUB_WORKSPACE"
+      - name: Read the development-loop test
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .artifacts/dsh930-watch
+          gh api "repos/wmqfl861/dsh930/contents/.dsh930/cloud-watch-smoke.mjs?ref=$GITHUB_SHA" --jq .content | base64 -d > .artifacts/dsh930-watch/smoke.mjs
+      - name: Build the same development image
+        run: docker build --progress=plain -f .devcontainer/Dockerfile -t dsh930-dev .
+      - name: Verify that source edits and their restoration are rebuilt and served
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp/dsh930-home -e CI=true \
+            -v "$PWD:/workspaces/dsh930" -w /workspaces/dsh930 \
+            dsh930-dev bash -c 'mkdir -p "$HOME"; node .artifacts/dsh930-watch/smoke.mjs' \
+            > .artifacts/dsh930-watch/watch.log 2>&1 || { tail -120 .artifacts/dsh930-watch/watch.log; exit 1; }
+          cat .artifacts/dsh930-watch/watch.log
+          git diff --exit-code
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: development-watch-results
+          path: .artifacts/dsh930-watch/
+          include-hidden-files: true
+          retention-days: 14
