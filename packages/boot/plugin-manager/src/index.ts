@@ -526,7 +526,7 @@ export class PluginManager extends TypertRemoteService {
         const succeeded = run.exitCode === 0 && run.timedOut !== true
         if (succeeded) delete result.failedAt
         if (!succeeded) {
-          // pnpm-workspace.yaml is not restored, so the names pnpm left undecided there can be offered for approval.
+          // The policy and installation layout survive cleanup, retaining pnpm's undecided script selectors.
           try { result.pendingBuilds = await readPendingBuilds(this.profile.dir) }
           catch (error) {
             this.ownerContext.logger.warn('Could not read pending build approvals after pnpm failed', error)

@@ -67,3 +67,56 @@ it.each([
   await expect(approveBuilds(dir, ['native'])).rejects.toThrow()
   expect(readFileSync(filename, 'utf8')).toBe(original)
 })
+
+function layout(dir: string, ignoredBuilds: unknown = ['native@1.0.0'], allowBuilds: unknown = {}) {
+  mkdirSync(join(dir, 'node_modules'), { recursive: true })
+  writeFileSync(join(dir, 'node_modules', '.modules.yaml'), JSON.stringify({
+    packageManager: 'pnpm@12.8.1', ignoredBuilds, allowBuilds,
+  }))
+}
+
+it('approves an exact pnpm 12 selector without granting scripts before the decision', async () => {
+  const { dir, filename } = fixture('# retained\nnodeLinker: isolated\n')
+  layout(dir, ['@scope/native@file:../local addon', 'other@1.0.0'])
+  expect(await readPendingBuilds(dir)).toEqual(['@scope/native@file:../local addon', 'other@1.0.0'])
+  expect(readFileSync(filename, 'utf8')).not.toContain('allowBuilds')
+  await approveBuilds(dir, ['@scope/native@file:../local addon'])
+  expect(parse(readFileSync(filename, 'utf8'))).toEqual({
+    nodeLinker: 'isolated', allowBuilds: { '@scope/native@file:../local addon': true },
+  })
+  expect(readFileSync(filename, 'utf8')).toContain('# retained')
+  // The first approval changed the policy; a fresh install must establish the remaining decisions.
+  await expect(approveBuilds(dir, ['other@1.0.0'])).rejects.toThrow('stale-approval')
+})
+
+it('rejects an unknown pnpm 12 approval atomically', async () => {
+  const { dir, filename } = fixture('{}\n')
+  layout(dir)
+  await expect(approveBuilds(dir, ['native@1.0.0', 'missing'])).rejects.toThrow('stale-approval')
+  expect(readFileSync(filename, 'utf8')).toBe('{}\n')
+})
+
+it('does not use stale layout decisions after a policy edit', async () => {
+  const { dir } = fixture('allowBuilds:\n  native: false\n')
+  layout(dir)
+  expect(await readPendingBuilds(dir)).toEqual([])
+  await expect(approveBuilds(dir, ['native@1.0.0'])).rejects.toThrow('stale-approval')
+})
+
+it.each(['native', 'native@1.0.0', 'native@^1'])('never overrides a persisted decision for %s', async (key) => {
+  const policy = { allowBuilds: { [key]: false } }
+  const { dir } = fixture(JSON.stringify(policy))
+  layout(dir, ['native@1.0.0'], policy.allowBuilds)
+  expect(await readPendingBuilds(dir)).toEqual([])
+  await expect(approveBuilds(dir, ['native@1.0.0'])).rejects.toThrow('stale-approval')
+})
+
+it.each([false, [12], ['*'], ['--all'], ['native?'], ['bad\nselector']])(
+  'rejects malformed pnpm 12 pending selectors: %s', async (ignored) => {
+    const { dir, filename } = fixture('{}\n')
+    layout(dir, ignored)
+    await expect(readPendingBuilds(dir)).rejects.toThrow()
+    await expect(approveBuilds(dir, ['native'])).rejects.toThrow()
+    expect(readFileSync(filename, 'utf8')).toBe('{}\n')
+  },
+)
