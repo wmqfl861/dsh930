@@ -1,0 +1,162 @@
+name: dsh930 development environment
+
+on:
+  push:
+    branches: [dev/node24]
+    paths:
+      - .github/workflows/dsh930-environment.yml
+      - .dsh930/upgrade.mjs
+      - '**/package.json'
+      - pnpm-workspace.yaml
+      - pnpm-lock.yaml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: dsh930-environment
+  cancel-in-progress: false
+
+env:
+  DSH_TELEMETRY_DISABLED: '1'
+  NODE_OPTIONS: --max-old-space-size=6144
+  CI: 'true'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+          check-latest: true
+          package-manager-cache: false
+      - name: Install a resolved stable package manager
+        run: |
+          set -euo pipefail
+          version="$(npm view pnpm dist-tags.latest)"
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          npm install --global "pnpm@$version"
+          echo "DSH930_PNPM_VERSION=$version" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/dsh930-results"
+          node --version
+          cc --version | head -1
+      - name: Resolve Node 24 types and dependency upgrades
+        id: resolve
+        continue-on-error: true
+        run: |
+          node .dsh930/upgrade.mjs > "$RUNNER_TEMP/dsh930-results/upgrade.log" 2>&1 || { tail -120 "$RUNNER_TEMP/dsh930-results/upgrade.log"; exit 1; }
+          tail -30 "$RUNNER_TEMP/dsh930-results/upgrade.log"
+      - name: Install the frozen upgraded lockfile
+        id: install
+        if: steps.resolve.outcome == 'success'
+        continue-on-error: true
+        run: |
+          pnpm install --frozen-lockfile > "$RUNNER_TEMP/dsh930-results/install.log" 2>&1 || { tail -120 "$RUNNER_TEMP/dsh930-results/install.log"; exit 1; }
+          tail -30 "$RUNNER_TEMP/dsh930-results/install.log"
+      - name: Build native, Host, Client and Web artifacts
+        id: build
+        if: steps.install.outcome == 'success'
+        continue-on-error: true
+        run: |
+          pnpm run build > "$RUNNER_TEMP/dsh930-results/build.log" 2>&1 || { tail -120 "$RUNNER_TEMP/dsh930-results/build.log"; exit 1; }
+          tail -30 "$RUNNER_TEMP/dsh930-results/build.log"
+      - name: Run repository unit tests
+        id: test
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        timeout-minutes: 15
+        run: |
+          pnpm exec vitest run --maxWorkers=2 > "$RUNNER_TEMP/dsh930-results/test.log" 2>&1 || { tail -160 "$RUNNER_TEMP/dsh930-results/test.log"; exit 1; }
+          tail -30 "$RUNNER_TEMP/dsh930-results/test.log"
+      - name: Lint the generated-contract source tree
+        id: lint
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          pnpm run lint:contracts-ready > "$RUNNER_TEMP/dsh930-results/lint.log" 2>&1 || { tail -120 "$RUNNER_TEMP/dsh930-results/lint.log"; exit 1; }
+          tail -30 "$RUNNER_TEMP/dsh930-results/lint.log"
+      - name: Start the Web UI without a model API call
+        id: smoke
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        env:
+          DSH_HOME: ${{ runner.temp }}/dsh930-smoke-home
+        run: |
+          set -euo pipefail
+          pnpm dsh web --no-open --port 3080 > "$RUNNER_TEMP/dsh930-results/web.log" 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3080/ > "$RUNNER_TEMP/dsh930-results/index.html"; then
+              echo 'Web UI responded with HTTP 200'
+              exit 0
+            fi
+            kill -0 "$server" 2>/dev/null || break
+            sleep 2
+          done
+          tail -120 "$RUNNER_TEMP/dsh930-results/web.log"
+          exit 1
+      - name: Record exact validation outcomes
+        if: always()
+        env:
+          RESOLVE: ${{ steps.resolve.outcome }}
+          INSTALL: ${{ steps.install.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+          TEST: ${{ steps.test.outcome }}
+          LINT: ${{ steps.lint.outcome }}
+          SMOKE: ${{ steps.smoke.outcome }}
+        run: |
+          mkdir -p .dsh930 "$RUNNER_TEMP/dsh930-results"
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const report = { node: process.version, pnpm: process.env.DSH930_PNPM_VERSION, sourceCommit: process.env.GITHUB_SHA, runId: process.env.GITHUB_RUN_ID, steps: Object.fromEntries(['RESOLVE','INSTALL','BUILD','TEST','LINT','SMOKE'].map(key => [key.toLowerCase(), process.env[key] || 'not-run'])) };
+          report.ready = ['install','build','test','lint','smoke'].every(key => report.steps[key] === 'success');
+          fs.writeFileSync('.dsh930/validation.json', JSON.stringify(report, null, 2) + '\n');
+          console.log(JSON.stringify(report, null, 2));
+          JS
+      - name: Commit only a validated environment to the development branch
+        if: steps.resolve.outcome == 'success' && steps.install.outcome == 'success' && steps.build.outcome == 'success' && steps.test.outcome == 'success' && steps.lint.outcome == 'success' && steps.smoke.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'dsh930 setup'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- '**/package.json' package.json pnpm-lock.yaml pnpm-workspace.yaml .nvmrc .node-version .dsh930
+          git diff --cached --check
+          git -c core.hooksPath=/dev/null commit -m 'build: validate Node 24 and updated workspace dependencies'
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push origin HEAD:refs/heads/dev/node24
+      - name: Export the source and installed workspace
+        if: always()
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/dsh930-results"
+          git rev-parse HEAD > "$RUNNER_TEMP/dsh930-results/source-head.txt"
+          git diff --binary > "$RUNNER_TEMP/dsh930-results/changes.patch"
+          cp .dsh930/*.json "$RUNNER_TEMP/dsh930-results/" 2>/dev/null || true
+          tar --exclude='./.git' --exclude='./.env' --exclude='./.env.*' --exclude='./apps/desktop/.env.windows' --exclude='./apps/desktop/.env.macos' -czf "$RUNNER_TEMP/dsh930-workspace.tar.gz" .
+          sha256sum "$RUNNER_TEMP/dsh930-workspace.tar.gz" > "$RUNNER_TEMP/dsh930-results/workspace-sha256.txt"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-validation-results
+          path: ${{ runner.temp }}/dsh930-results/
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-installed-workspace
+          path: ${{ runner.temp }}/dsh930-workspace.tar.gz
+          compression-level: 0
+          retention-days: 7
+      - name: Require a ready development environment
+        if: always()
+        run: node --input-type=module -e "import fs from 'node:fs'; if (!JSON.parse(fs.readFileSync('.dsh930/validation.json', 'utf8')).ready) process.exit(1);"
