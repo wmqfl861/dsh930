@@ -1,0 +1,93 @@
+name: dsh930 built workspace transfer
+
+on:
+  push:
+    branches: [ops/artifact-transfer]
+    paths: [.github/workflows/dsh930-transfer-v2.yml]
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  transfer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Locate the prepared workspace artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 50); do
+            id="$(gh api repos/wmqfl861/dsh930/actions/runs/36813104476/artifacts --jq '.artifacts[] | select(.name == "dsh930-installed-workspace") | .id')"
+            if test -n "$id"; then exit 0; fi
+            sleep 10
+          done
+          echo 'The preparation run did not export its workspace.' >&2
+          exit 1
+      - uses: actions/download-artifact@v4
+        with:
+          name: dsh930-installed-workspace
+          run-id: 36813104476
+          github-token: ${{ github.token }}
+          repository: wmqfl861/dsh930
+          path: ${{ runner.temp }}/original
+      - name: Split the original archive without changing its bytes
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/parts"
+          split -b 240M -d "$RUNNER_TEMP/original/workspace.tar.gz" "$RUNNER_TEMP/parts/workspace.part-"
+          cd "$RUNNER_TEMP/parts"
+          sha256sum workspace.part-* > SHA256SUMS
+          sha256sum "$RUNNER_TEMP/original/workspace.tar.gz" > ORIGINAL_SHA256
+          test "$(find . -name 'workspace.part-*' | wc -l)" -le 6
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-vite8-workspace-part-00
+          path: ${{ runner.temp }}/parts/workspace.part-00
+          compression-level: 0
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-vite8-workspace-part-01
+          path: ${{ runner.temp }}/parts/workspace.part-01
+          compression-level: 0
+          if-no-files-found: ignore
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-vite8-workspace-part-02
+          path: ${{ runner.temp }}/parts/workspace.part-02
+          compression-level: 0
+          if-no-files-found: ignore
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-vite8-workspace-part-03
+          path: ${{ runner.temp }}/parts/workspace.part-03
+          compression-level: 0
+          if-no-files-found: ignore
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-vite8-workspace-part-04
+          path: ${{ runner.temp }}/parts/workspace.part-04
+          compression-level: 0
+          if-no-files-found: ignore
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-vite8-workspace-part-05
+          path: ${{ runner.temp }}/parts/workspace.part-05
+          compression-level: 0
+          if-no-files-found: ignore
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh930-vite8-workspace-checksums
+          path: |
+            ${{ runner.temp }}/parts/SHA256SUMS
+            ${{ runner.temp }}/parts/ORIGINAL_SHA256
+          retention-days: 7
