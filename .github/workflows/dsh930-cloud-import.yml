@@ -31,7 +31,6 @@ jobs:
           root = pathlib.Path(os.environ['RUNNER_TEMP']) / 'transfer'
           text = (root / 'payload.b64').read_text().strip()
           assert hashlib.sha256(text.encode()).hexdigest() == '256acb869b1f41121efcb023efa52bc04788e7f44df316d28dad223e9831fcd9'
-          # Repair only the four known transcription errors, from right to left.
           for start, end, replacement in [(13017, 13017, 'V'), (12175, 12176, ''), (10980, 10981, ''), (8922, 8923, '')]:
               text = text[:start] + replacement + text[end:]
           assert hashlib.sha256(text.encode()).hexdigest() == 'fc9127c3696bce45c11ca5976cbe2456617db478d94743f96ae9dd365b240545'
@@ -39,11 +38,23 @@ jobs:
           assert hashlib.sha256(patch).hexdigest() == 'ca6e3914d9c1ac49a416a7c247ae0ff6dc8d8e1ef9a653b6a2f01676465e8860'
           (root / 'cloud-baseline.patch').write_bytes(patch)
           PY
-      - name: Apply, review and create a candidate commit
+      - name: Apply source changes and synchronize the stale MCP dependency assertion
         run: |
           set -euo pipefail
           git apply --check "$RUNNER_TEMP/transfer/cloud-baseline.patch"
           git apply "$RUNNER_TEMP/transfer/cloud-baseline.patch"
+          # GITHUB_TOKEN cannot edit workflows. Those changes use the authorized GitHub connection separately.
+          git restore --source HEAD --worktree .github/workflows/dsh930-bootstrap.yml .github/workflows/dsh930-environment.yml .github/workflows/dsh930-retrieve.yml
+          rm .github/workflows/dsh930-development.yml
+          python3 - <<'PY'
+          import pathlib, json
+          root = pathlib.Path('packages/subagent/subagent-claude-code')
+          assert json.loads((root / 'package.json').read_text())['dependencies']['@modelcontextprotocol/sdk'] == '^1.31.0'
+          path = root / 'tests/subagent-claude-code.spec.ts'
+          text = path.read_text()
+          assert text.count("'^1.29.0'") == 1
+          path.write_text(text.replace("'^1.29.0'", "'^1.31.0'"))
+          PY
           git add --all
           git diff --cached --check
           git config user.name 'dsh930 setup'
