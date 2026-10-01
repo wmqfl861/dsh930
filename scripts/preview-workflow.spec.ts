@@ -1,9 +1,10 @@
+/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import * as yaml from 'js-yaml'
 import { describe, expect, it } from 'vitest'
 
-const workflow = yaml.load(readFileSync(resolve(import.meta.dirname, '../.github/workflows/build-preview-cloudflare.yml'), 'utf8')) as {
+const workflow = yaml.load(readFileSync(resolve(import.meta.dirname, '../.github/upstream-workflows/build-preview-cloudflare.yml'), 'utf8')) as {
   on: unknown
   permissions: unknown
   concurrency: unknown

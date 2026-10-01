@@ -1,3 +1,4 @@
+/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join, resolve } from 'node:path'
@@ -23,7 +24,7 @@ interface CompatibilityJob {
   steps: Step[]
 }
 
-const workflow = yaml.load(readFileSync(resolve(import.meta.dirname, '../.github/workflows/ci.yml'), 'utf8')) as {
+const workflow = yaml.load(readFileSync(resolve(import.meta.dirname, '../.github/upstream-workflows/ci.yml'), 'utf8')) as {
   jobs: { 'node-compat': CompatibilityJob; 'python-sdk': { 'runs-on': string } }
 }
 const job = workflow.jobs['node-compat']

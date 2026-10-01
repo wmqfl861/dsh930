@@ -1,3 +1,4 @@
+/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { runInNewContext } from 'node:vm'
@@ -66,7 +67,7 @@ describe('CI workflow', () => {
     const files = ['.github/workflows/ci.yml', '.github/workflows/ci-master.yml']
     const setups: Array<{ jobName: string; step: unknown }> = []
     for (const file of files) {
-      const workflow: unknown = yaml.load(readFileSync(resolve(root, file), 'utf8'))
+      const workflow: unknown = yaml.load(readFileSync(resolve(root, file.replace('.github/workflows/', '.github/upstream-workflows/')), 'utf8'))
       if (!isRecord(workflow) || !isRecord(workflow.jobs)) throw new TypeError(`${file} must define jobs`)
       for (const [jobName, job] of Object.entries(workflow.jobs)) {
         if (!isRecord(job) || !Array.isArray(job.steps)) continue
@@ -130,7 +131,7 @@ describe('CI workflow', () => {
   )
 
   it('isolates the python SDK exe pnpm setup destination per job', () => {
-    const workflow: unknown = yaml.load(readFileSync(resolve(root, '.github/workflows/build-exe-for-python-sdk.yml'), 'utf8'))
+    const workflow: unknown = yaml.load(readFileSync(resolve(root, '.github/upstream-workflows/build-exe-for-python-sdk.yml'), 'utf8'))
     if (!isRecord(workflow) || !isRecord(workflow.jobs)) throw new TypeError('build-exe-for-python-sdk.yml must define jobs')
     const setups: Array<{ step: unknown }> = []
     for (const job of Object.values(workflow.jobs)) {
@@ -1227,7 +1228,7 @@ describe('Git hooks', () => {
 })
 
 function loadWorkflow(path: string): Record<string, unknown> {
-  const workflow: unknown = yaml.load(readFileSync(resolve(root, path), 'utf8'))
+  const workflow: unknown = yaml.load(readFileSync(resolve(root, path.replace('.github/workflows/', '.github/upstream-workflows/')), 'utf8'))
   if (!isRecord(workflow)) throw new TypeError(`${path} must define a workflow`)
   return workflow
 }

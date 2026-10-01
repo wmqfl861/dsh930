@@ -1,0 +1,2778 @@
+{
+  "node": "v24.21.0",
+  "pnpm": "12.8.1",
+  "workspaceCount": 339,
+  "status": "resolved-not-yet-validated",
+  "changes": [
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "@testing-library/dom",
+      "from": "^10.4.1",
+      "to": "^10.4.2"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.3.2",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "@types/node",
+      "from": "^22.20.0",
+      "to": "24"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "@vitest/coverage-v8",
+      "from": "^4.1.8",
+      "to": "^4.1.11"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "@yarnpkg/cli-dist",
+      "from": "4.17.1",
+      "to": "4.18.1"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "eslint-plugin-sonarjs",
+      "from": "^4.1.0",
+      "to": "^4.2.2"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "execa",
+      "from": "^10.0.0",
+      "to": "^10.0.1"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "fast-check",
+      "from": "^4.8.0",
+      "to": "^4.10.2"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "fflate",
+      "from": "^0.8.2",
+      "to": "^0.8.3"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "jscpd",
+      "from": "^5.0.12",
+      "to": "^5.3.3"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "lefthook",
+      "from": "^2.1.9",
+      "to": "^2.1.15"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "lightningcss",
+      "from": "^1.32.0",
+      "to": "^1.33.0"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "mermaid",
+      "from": "11.16.0",
+      "to": "11.17.2"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "oxlint",
+      "from": "1.76.0",
+      "to": "1.86.0"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "oxlint-tsgolint",
+      "from": "7.0.2001",
+      "to": "7.0.2003"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "pnpm",
+      "from": "11.7.0",
+      "to": "12.8.1"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "publint",
+      "from": "^0.3.21",
+      "to": "^0.3.24"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "smol-toml",
+      "from": "^1.7.1",
+      "to": "^1.9.0"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "tar",
+      "from": "^7.5.0",
+      "to": "^7.5.22"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "tsdown",
+      "from": "^0.22.2",
+      "to": "^0.22.14"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "tsx",
+      "from": "^4.22.4",
+      "to": "^4.23.15"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "vitest",
+      "from": "^4.1.8",
+      "to": "^4.1.11"
+    },
+    {
+      "workspace": ".",
+      "section": "devDependencies",
+      "name": "vite",
+      "from": "^8.0.16",
+      "to": "^8.3.1"
+    },
+    {
+      "workspace": "apps/cli",
+      "section": "dependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "apps/cli",
+      "section": "devDependencies",
+      "name": "@agentclientprotocol/sdk",
+      "from": "1.4.0",
+      "to": "1.5.1"
+    },
+    {
+      "workspace": "apps/cli",
+      "section": "devDependencies",
+      "name": "@types/ws",
+      "from": "8.18.1",
+      "to": "8.18.2"
+    },
+    {
+      "workspace": "apps/cli",
+      "section": "devDependencies",
+      "name": "execa",
+      "from": "^10.0.0",
+      "to": "^10.0.1"
+    },
+    {
+      "workspace": "apps/cli",
+      "section": "devDependencies",
+      "name": "ws",
+      "from": "8.21.0",
+      "to": "8.22.0"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "dependencies",
+      "name": "ws",
+      "from": "^8.21.0",
+      "to": "^8.22.0"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "@types/node",
+      "from": "^22.20.0",
+      "to": "24"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "electron",
+      "from": "^44.0.0",
+      "to": "^44.5.0"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "sharp",
+      "from": "^0.35.3",
+      "to": "^0.35.5"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "@types/ws",
+      "from": "^8.18.1",
+      "to": "^8.18.2"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "apps/desktop",
+      "section": "devDependencies",
+      "name": "vite",
+      "from": "^6.0.0",
+      "to": "^6.4.3"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "@types/node",
+      "from": "^22.0.0",
+      "to": "24"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "@types/ws",
+      "from": "8.18.1",
+      "to": "8.18.2"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "@vitejs/plugin-react",
+      "from": "^4.0.0",
+      "to": "^4.7.0"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "fflate",
+      "from": "^0.8.2",
+      "to": "^0.8.3"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "playwright",
+      "from": "^1.49.0",
+      "to": "^1.63.0"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "vite",
+      "from": "^6.0.0",
+      "to": "^6.4.3"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "vitest",
+      "from": "^4.1.8",
+      "to": "^4.1.11"
+    },
+    {
+      "workspace": "apps/web",
+      "section": "devDependencies",
+      "name": "ws",
+      "from": "8.21.0",
+      "to": "8.22.0"
+    },
+    {
+      "workspace": "benchmarks",
+      "section": "devDependencies",
+      "name": "playwright",
+      "from": "^1.49.0",
+      "to": "^1.63.0"
+    },
+    {
+      "workspace": "native/system",
+      "section": "devDependencies",
+      "name": "@types/node",
+      "from": "^26.0.1",
+      "to": "24"
+    },
+    {
+      "workspace": "native/system",
+      "section": "devDependencies",
+      "name": "tsx",
+      "from": "^4.20.6",
+      "to": "^4.23.15"
+    },
+    {
+      "workspace": "packages/acp/acp",
+      "section": "dependencies",
+      "name": "@agentclientprotocol/sdk",
+      "from": "1.4.0",
+      "to": "1.5.1"
+    },
+    {
+      "workspace": "packages/api/gateway",
+      "section": "dependencies",
+      "name": "ws",
+      "from": "^8.21.0",
+      "to": "^8.22.0"
+    },
+    {
+      "workspace": "packages/api/gateway",
+      "section": "devDependencies",
+      "name": "@types/ws",
+      "from": "^8.18.1",
+      "to": "^8.18.2"
+    },
+    {
+      "workspace": "packages/attachment/attachment-local",
+      "section": "dependencies",
+      "name": "sharp",
+      "from": "^0.35.3",
+      "to": "^0.35.5"
+    },
+    {
+      "workspace": "packages/boot/app-boot",
+      "section": "dependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/boot/config-editor",
+      "section": "dependencies",
+      "name": "yaml",
+      "from": "^2.8.1",
+      "to": "^2.9.1"
+    },
+    {
+      "workspace": "packages/boot/config-editor",
+      "section": "dependencies",
+      "name": "js-yaml",
+      "from": "^4.1.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/boot/hmr",
+      "section": "dependencies",
+      "name": "@babel/code-frame",
+      "from": "^7.29.0",
+      "to": "^7.29.7"
+    },
+    {
+      "workspace": "packages/boot/hmr",
+      "section": "dependencies",
+      "name": "picomatch",
+      "from": "^4.0.3",
+      "to": "^4.0.7"
+    },
+    {
+      "workspace": "packages/boot/hmr",
+      "section": "devDependencies",
+      "name": "esbuild",
+      "from": "^0.28.1",
+      "to": "^0.28.2"
+    },
+    {
+      "workspace": "packages/boot/plugin-manager",
+      "section": "dependencies",
+      "name": "execa",
+      "from": "^10.0.0",
+      "to": "^10.0.1"
+    },
+    {
+      "workspace": "packages/boot/plugin-manager",
+      "section": "dependencies",
+      "name": "yaml",
+      "from": "^2.9.0",
+      "to": "^2.9.1"
+    },
+    {
+      "workspace": "packages/bundle/web-app",
+      "section": "dependencies",
+      "name": "open",
+      "from": "^11.0.0",
+      "to": "^11.0.4"
+    },
+    {
+      "workspace": "packages/client/locale",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/locale",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/store",
+      "section": "devDependencies",
+      "name": "immer",
+      "from": "^10.1.1",
+      "to": "^10.2.0"
+    },
+    {
+      "workspace": "packages/client/ui-agent-preset",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-agent-preset",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-approval",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-approval",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-attachment",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-attachment",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-attachment",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-attachment",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-attachment",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-brand-official",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-brand-official",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-brand-official",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-brand-official",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-chat",
+      "section": "devDependencies",
+      "name": "@tanstack/react-virtual",
+      "from": "^3.14.9",
+      "to": "^3.14.13"
+    },
+    {
+      "workspace": "packages/client/ui-chat",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-chat",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-chat",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-chat",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-commands",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-commands",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-commands",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-conversation",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-conversation",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-conversation",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-conversation",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-conversation",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-deliverables",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-deliverables",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-browse",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-browse",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-browse",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-browse",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-browse",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-native",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-native",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-native",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-directory-picker-native",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-dockkit",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-dockkit",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-dockkit",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-dockkit",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-dockkit",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-dockkit",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-goal",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-goal",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-goal",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-goal",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-input-trigger",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-input-trigger",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-input-trigger",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-jobs",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-jobs",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-layout",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-layout",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-message-feedback",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-message-feedback",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-message-feedback",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-message-feedback",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-message-feedback",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-model-selection",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-model-selection",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-model-selection",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-model-selection",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-open-in-app",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-open-in-app",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-permission-presets",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-permission-presets",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-permission-presets",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-plan",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-plan",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-plugin-manager",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-plugin-manager",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-plugin-manager",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-plugin-manager",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-plugin-manager",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "micromark-core-commonmark",
+      "from": "^2.0.3",
+      "to": "^2.0.4"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "micromark-util-types",
+      "from": "^2.0.2",
+      "to": "^2.0.3"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "shiki",
+      "from": "^4.3.1",
+      "to": "^4.4.3"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "@shikijs/langs",
+      "from": "^4.3.1",
+      "to": "^4.4.3"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "micromark-factory-space",
+      "from": "^2.0.1",
+      "to": "^2.1.0"
+    },
+    {
+      "workspace": "packages/client/ui-primitives",
+      "section": "devDependencies",
+      "name": "simple-icons",
+      "from": "16.31.0",
+      "to": "16.33.0"
+    },
+    {
+      "workspace": "packages/client/ui-renderer",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-renderer",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-renderer",
+      "section": "devDependencies",
+      "name": "@types/use-sync-external-store",
+      "from": "^1.5.0",
+      "to": "^1.7.0"
+    },
+    {
+      "workspace": "packages/client/ui-renderer",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-renderer",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-renderer",
+      "section": "devDependencies",
+      "name": "use-sync-external-store",
+      "from": "1.2.0",
+      "to": "1.7.0"
+    },
+    {
+      "workspace": "packages/client/ui-schedule",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-schedule",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-schedule",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-schedule",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-schedule",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-session",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-session",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-account",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-settings-account",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-account",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-account",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-account",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-settings-agent-loop",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-agent-loop",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-general",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-general",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-settings-general",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-general",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-general",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-models",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-models",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-plugin-inventory",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-settings-plugin-inventory",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-plugin-inventory",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-plugin-inventory",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-plugins",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-plugins",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-session-log",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-session-log",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-session-log",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-session-log",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-settings-shell",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-shell",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-subagent",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-subagent",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-settings-web-search",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-settings-web-search",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-shortcuts",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-shortcuts",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-browser",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-browser",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-browser",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-browser",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-browser",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "@types/papaparse",
+      "from": "^5.3.16",
+      "to": "^5.5.2"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "dompurify",
+      "from": "^3.4.11",
+      "to": "^3.4.16"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "fast-xml-parser",
+      "from": "5.11.1",
+      "to": "5.11.2"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "papaparse",
+      "from": "5.5.3",
+      "to": "5.7.0"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-documentpreview",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-files",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-files",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-files",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-files",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-files",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-files",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-right",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-right",
+      "section": "devDependencies",
+      "name": "@types/picomatch",
+      "from": "^4.0.2",
+      "to": "^4.0.3"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-right",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-right",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-right",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-right",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-right",
+      "section": "devDependencies",
+      "name": "picomatch",
+      "from": "^4.0.4",
+      "to": "^4.0.7"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-right",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-terminal",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-terminal",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-terminal",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-terminal",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-terminal",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-sidebar-terminal",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-skill",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-skill",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-skill",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-skill",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-slots",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-subagent",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-subagent",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-subagent",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-subagent",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-theme",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-theme",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-theme",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-tool",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/client/ui-tool",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-tool",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-tool",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-tool",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-trajectory",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-trajectory",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/ui-trajectory",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-trajectory",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-trajectory",
+      "section": "devDependencies",
+      "name": "@tanstack/react-virtual",
+      "from": "^3.14.9",
+      "to": "^3.14.13"
+    },
+    {
+      "workspace": "packages/client/ui-user-questions",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-user-questions",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-user-questions",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-workflow-run",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-workflow-run",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/ui-workspace",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/ui-workspace",
+      "section": "devDependencies",
+      "name": "clsx",
+      "from": "^2.0.0",
+      "to": "^2.1.1"
+    },
+    {
+      "workspace": "packages/client/ui-workspace",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/web",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/client/web",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/client/web",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/client/web",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/credentials/credentials-local",
+      "section": "dependencies",
+      "name": "yaml",
+      "from": "^2.9.0",
+      "to": "^2.9.1"
+    },
+    {
+      "workspace": "packages/experimental/agent-team-profile",
+      "section": "devDependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/experimental/browser-use-chrome-devtools-mcp",
+      "section": "dependencies",
+      "name": "chrome-devtools-mcp",
+      "from": "1.9.0",
+      "to": "1.10.1"
+    },
+    {
+      "workspace": "packages/experimental/browser-use-playwright-mcp",
+      "section": "dependencies",
+      "name": "@playwright/mcp",
+      "from": "0.0.80",
+      "to": "0.0.83"
+    },
+    {
+      "workspace": "packages/experimental/browser-use-stagehand-native",
+      "section": "dependencies",
+      "name": "@puppeteer/browsers",
+      "from": "3.2.2",
+      "to": "3.2.3"
+    },
+    {
+      "workspace": "packages/experimental/browser-use-stagehand-native",
+      "section": "devDependencies",
+      "name": "tsx",
+      "from": "^4.19.2",
+      "to": "^4.23.15"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-agent-team",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-agent-team",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-agent-team",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-agent-team",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-agent-team",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-voice-input",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-voice-input",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-voice-input",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/experimental/client-ui-voice-input",
+      "section": "devDependencies",
+      "name": "@testing-library/react",
+      "from": "^16.1.0",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/experimental/inspector",
+      "section": "dependencies",
+      "name": "ws",
+      "from": "^8.21.0",
+      "to": "^8.22.0"
+    },
+    {
+      "workspace": "packages/experimental/inspector",
+      "section": "devDependencies",
+      "name": "@types/ws",
+      "from": "^8.18.1",
+      "to": "^8.18.2"
+    },
+    {
+      "workspace": "packages/experimental/inspector",
+      "section": "devDependencies",
+      "name": "playwright",
+      "from": "^1.49.0",
+      "to": "^1.63.0"
+    },
+    {
+      "workspace": "packages/experimental/inspector",
+      "section": "devDependencies",
+      "name": "tsx",
+      "from": "^4.19.2",
+      "to": "^4.23.15"
+    },
+    {
+      "workspace": "packages/experimental/schedule-bundle",
+      "section": "devDependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/experimental/speech-to-text-sensevoice",
+      "section": "devDependencies",
+      "name": "tsx",
+      "from": "^4.22.4",
+      "to": "^4.23.15"
+    },
+    {
+      "workspace": "packages/experimental/voice-input-bundle",
+      "section": "devDependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/experimental/webworker-packer",
+      "section": "dependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/experimental/webworker-packer",
+      "section": "dependencies",
+      "name": "picomatch",
+      "from": "^4.0.4",
+      "to": "^4.0.7"
+    },
+    {
+      "workspace": "packages/experimental/webworker-runtime",
+      "section": "dependencies",
+      "name": "@noble/hashes",
+      "from": "^2.3.0",
+      "to": "^2.4.0"
+    },
+    {
+      "workspace": "packages/experimental/webworker-runtime",
+      "section": "dependencies",
+      "name": "acorn",
+      "from": "^8.17.0",
+      "to": "^8.18.0"
+    },
+    {
+      "workspace": "packages/experimental/webworker-runtime",
+      "section": "dependencies",
+      "name": "picomatch",
+      "from": "^4.0.4",
+      "to": "^4.0.7"
+    },
+    {
+      "workspace": "packages/experimental/webworker-runtime",
+      "section": "devDependencies",
+      "name": "@types/readable-stream",
+      "from": "^4.0.24",
+      "to": "^4.0.25"
+    },
+    {
+      "workspace": "packages/extensions/cordis-client-runner",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/extensions/cordis-client-runner",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/extensions/ui-cordis",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/extensions/ui-cordis",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/host/directory-picker-native",
+      "section": "devDependencies",
+      "name": "tsx",
+      "from": "^4.19.2",
+      "to": "^4.23.15"
+    },
+    {
+      "workspace": "packages/host/webserver",
+      "section": "dependencies",
+      "name": "compression",
+      "from": "^1.8.1",
+      "to": "^1.8.2"
+    },
+    {
+      "workspace": "packages/host/webserver",
+      "section": "dependencies",
+      "name": "negotiator",
+      "from": "^1.0.0",
+      "to": "^1.1.0"
+    },
+    {
+      "workspace": "packages/llm/llm-deepseek",
+      "section": "dependencies",
+      "name": "eventsource-parser",
+      "from": "^3.1.0",
+      "to": "^3.1.1"
+    },
+    {
+      "workspace": "packages/lsp/lsp-stdio",
+      "section": "devDependencies",
+      "name": "typescript-language-server",
+      "from": "^5.0.0",
+      "to": "^5.3.0"
+    },
+    {
+      "workspace": "packages/mcp/mcp-client",
+      "section": "dependencies",
+      "name": "@modelcontextprotocol/client",
+      "from": "2.0.0",
+      "to": "2.2.0"
+    },
+    {
+      "workspace": "packages/mcp/mcp-client",
+      "section": "devDependencies",
+      "name": "@modelcontextprotocol/server-everything",
+      "from": "^2026.7.4",
+      "to": "^2026.8.31"
+    },
+    {
+      "workspace": "packages/mcp/mcp-client",
+      "section": "devDependencies",
+      "name": "@modelcontextprotocol/server-filesystem",
+      "from": "^2026.7.4",
+      "to": "^2026.8.31"
+    },
+    {
+      "workspace": "packages/mcp/mcp-client",
+      "section": "devDependencies",
+      "name": "@modelcontextprotocol/server",
+      "from": "2.0.0",
+      "to": "2.2.0"
+    },
+    {
+      "workspace": "packages/mcp/mcp-client",
+      "section": "devDependencies",
+      "name": "@modelcontextprotocol/node",
+      "from": "2.0.0",
+      "to": "2.1.0"
+    },
+    {
+      "workspace": "packages/preset/agent-preset",
+      "section": "devDependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/preset/agent-preset-registry",
+      "section": "dependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/sandbox/sandbox-windows-acl",
+      "section": "dependencies",
+      "name": "yaml",
+      "from": "^2.4.2",
+      "to": "^2.9.1"
+    },
+    {
+      "workspace": "packages/session-query/session-log-export",
+      "section": "dependencies",
+      "name": "fflate",
+      "from": "^0.8.2",
+      "to": "^0.8.3"
+    },
+    {
+      "workspace": "packages/session-query/session-log-export",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/session-query/session-log-export",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/settings/settings",
+      "section": "dependencies",
+      "name": "yaml",
+      "from": "^2.8.1",
+      "to": "^2.9.1"
+    },
+    {
+      "workspace": "packages/skill/skill-filesystem",
+      "section": "dependencies",
+      "name": "yaml",
+      "from": "^2.4.2",
+      "to": "^2.9.1"
+    },
+    {
+      "workspace": "packages/skill/skill-office",
+      "section": "dependencies",
+      "name": "yaml",
+      "from": "^2.4.2",
+      "to": "^2.9.1"
+    },
+    {
+      "workspace": "packages/spill/spill-policy",
+      "section": "devDependencies",
+      "name": "sharp",
+      "from": "^0.35.3",
+      "to": "^0.35.5"
+    },
+    {
+      "workspace": "packages/subagent/subagent-acp",
+      "section": "dependencies",
+      "name": "@agentclientprotocol/sdk",
+      "from": "1.4.0",
+      "to": "1.5.1"
+    },
+    {
+      "workspace": "packages/subagent/subagent-claude-code",
+      "section": "dependencies",
+      "name": "@modelcontextprotocol/sdk",
+      "from": "^1.29.0",
+      "to": "^1.31.0"
+    },
+    {
+      "workspace": "packages/telemetry/otel",
+      "section": "dependencies",
+      "name": "@opentelemetry/resources",
+      "from": "^2.9.0",
+      "to": "^2.11.0"
+    },
+    {
+      "workspace": "packages/telemetry/otel",
+      "section": "dependencies",
+      "name": "@opentelemetry/core",
+      "from": "2.9.0",
+      "to": "2.11.0"
+    },
+    {
+      "workspace": "packages/test-support/client-runtime",
+      "section": "dependencies",
+      "name": "@testing-library/dom",
+      "from": "^10.4.1",
+      "to": "^10.4.2"
+    },
+    {
+      "workspace": "packages/test-support/client-runtime",
+      "section": "dependencies",
+      "name": "@testing-library/react",
+      "from": "^16.3.2",
+      "to": "^16.3.3"
+    },
+    {
+      "workspace": "packages/test-support/client-runtime",
+      "section": "dependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/test-support/client-runtime",
+      "section": "dependencies",
+      "name": "vitest",
+      "from": "^4.1.8",
+      "to": "^4.1.11"
+    },
+    {
+      "workspace": "packages/test-support/client-runtime",
+      "section": "devDependencies",
+      "name": "@types/react",
+      "from": "~18.3.1",
+      "to": "~18.3.31"
+    },
+    {
+      "workspace": "packages/test-support/client-runtime",
+      "section": "devDependencies",
+      "name": "@types/react-dom",
+      "from": "~18.3.0",
+      "to": "~18.3.7"
+    },
+    {
+      "workspace": "packages/test-support/client-runtime",
+      "section": "devDependencies",
+      "name": "react",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/test-support/client-runtime",
+      "section": "devDependencies",
+      "name": "react-dom",
+      "from": "^18.2.0",
+      "to": "^18.3.1"
+    },
+    {
+      "workspace": "packages/test-support/loader-smoke",
+      "section": "dependencies",
+      "name": "execa",
+      "from": "^10.0.0",
+      "to": "^10.0.1"
+    },
+    {
+      "workspace": "packages/test-support/loader-smoke",
+      "section": "dependencies",
+      "name": "tsx",
+      "from": "^4.22.4",
+      "to": "^4.23.15"
+    },
+    {
+      "workspace": "packages/test-support/remote-mock",
+      "section": "dependencies",
+      "name": "@vitest/spy",
+      "from": "^4.1.8",
+      "to": "^4.1.11"
+    },
+    {
+      "workspace": "packages/test-support/session-snapshot",
+      "section": "dependencies",
+      "name": "@agentclientprotocol/sdk",
+      "from": "1.4.0",
+      "to": "1.5.1"
+    },
+    {
+      "workspace": "packages/test-support/session-snapshot",
+      "section": "dependencies",
+      "name": "js-yaml",
+      "from": "^4.2.0",
+      "to": "^4.3.2"
+    },
+    {
+      "workspace": "packages/test-support/session-snapshot",
+      "section": "dependencies",
+      "name": "vitest",
+      "from": "^4.1.8",
+      "to": "^4.1.11"
+    },
+    {
+      "workspace": "packages/util/http-proxy",
+      "section": "dependencies",
+      "name": "undici",
+      "from": "^8.10.0",
+      "to": "^8.11.2"
+    },
+    {
+      "workspace": "packages/web/tool-web",
+      "section": "dependencies",
+      "name": "@joplin/turndown-plugin-gfm",
+      "from": "^1.0.67",
+      "to": "^1.0.68"
+    },
+    {
+      "workspace": "packages/web/web-fetch-http",
+      "section": "dependencies",
+      "name": "undici",
+      "from": "^8.10.0",
+      "to": "^8.11.2"
+    },
+    {
+      "workspace": "website",
+      "section": "devDependencies",
+      "name": "cytoscape",
+      "from": "3.34.0",
+      "to": "3.34.3"
+    },
+    {
+      "workspace": "website",
+      "section": "devDependencies",
+      "name": "dayjs",
+      "from": "1.11.21",
+      "to": "1.11.23"
+    },
+    {
+      "workspace": "website",
+      "section": "devDependencies",
+      "name": "mermaid",
+      "from": "11.16.0",
+      "to": "11.17.2"
+    },
+    {
+      "workspace": "website",
+      "section": "devDependencies",
+      "name": "vite",
+      "from": "^5.4.14",
+      "to": "^5.4.21"
+    },
+    {
+      "workspace": "website",
+      "section": "devDependencies",
+      "name": "vue",
+      "from": "3.5.39",
+      "to": "3.5.43"
+    }
+  ],
+  "deferred": [
+    {
+      "name": "koffi",
+      "reasons": [
+        "Pinned upstream pending native build and packed-install qualification"
+      ]
+    },
+    {
+      "name": "@earendil-works/pi-ai",
+      "reasons": [
+        "Version-bound patch: @earendil-works/pi-ai@0.87.1",
+        "Reviewed coupled runtime release: @earendil-works/pi-ai@0.87.1"
+      ]
+    },
+    {
+      "name": "@electron/osx-sign",
+      "reasons": [
+        "Version-bound patch: @electron/osx-sign@1.3.3"
+      ]
+    },
+    {
+      "name": "@fortune-sheet/core",
+      "reasons": [
+        "Version-bound patch: @fortune-sheet/core@1.0.4"
+      ]
+    },
+    {
+      "name": "@fortune-sheet/react",
+      "reasons": [
+        "Version-bound patch: @fortune-sheet/react@1.0.4"
+      ]
+    },
+    {
+      "name": "@yao-pkg/pkg",
+      "reasons": [
+        "Version-bound patch: @yao-pkg/pkg@6.21.0"
+      ]
+    },
+    {
+      "name": "exceljs",
+      "reasons": [
+        "Version-bound patch: exceljs@4.4.0"
+      ]
+    },
+    {
+      "name": "node-pty",
+      "reasons": [
+        "Version-bound patch: node-pty@1.2.0-beta.15"
+      ]
+    },
+    {
+      "name": "zod",
+      "reasons": [
+        "Override: zod@^4"
+      ]
+    },
+    {
+      "name": "extract-zip",
+      "reasons": [
+        "Override: extract-zip>yauzl"
+      ]
+    },
+    {
+      "name": "yauzl",
+      "reasons": [
+        "Override: extract-zip>yauzl"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/cosmokit",
+      "reasons": [
+        "Override: @deepseek-ai/cosmokit"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/schemastery",
+      "reasons": [
+        "Override: @deepseek-ai/schemastery"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/libreoffice-kit",
+      "reasons": [
+        "Reviewed coupled runtime release: @deepseek-ai/libreoffice-kit@0.1.1"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/libreoffice-kit-darwin-arm64",
+      "reasons": [
+        "Reviewed coupled runtime release: @deepseek-ai/libreoffice-kit-darwin-arm64@0.1.1"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/libreoffice-kit-darwin-x64",
+      "reasons": [
+        "Reviewed coupled runtime release: @deepseek-ai/libreoffice-kit-darwin-x64@0.1.1"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/libreoffice-kit-win32-arm64",
+      "reasons": [
+        "Reviewed coupled runtime release: @deepseek-ai/libreoffice-kit-win32-arm64@0.1.1"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/libreoffice-kit-win32-x64",
+      "reasons": [
+        "Reviewed coupled runtime release: @deepseek-ai/libreoffice-kit-win32-x64@0.1.1"
+      ]
+    },
+    {
+      "name": "@deepseek-ai/libreoffice-kit-wasm",
+      "reasons": [
+        "Reviewed coupled runtime release: @deepseek-ai/libreoffice-kit-wasm@0.1.1"
+      ]
+    },
+    {
+      "name": "@earendil-works/pi-telemetry",
+      "reasons": [
+        "Reviewed coupled runtime release: @earendil-works/pi-telemetry@0.87.1"
+      ]
+    },
+    {
+      "name": "node-addon-native-custom-loader",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-native-custom-loader@0.1.6"
+      ]
+    },
+    {
+      "name": "node-addon-require-builtin-darwin-arm64",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-require-builtin-darwin-arm64@0.1.6"
+      ]
+    },
+    {
+      "name": "node-addon-require-builtin-darwin-x64",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-require-builtin-darwin-x64@0.1.6"
+      ]
+    },
+    {
+      "name": "node-addon-require-builtin-linux-arm64-gnu",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-require-builtin-linux-arm64-gnu@0.1.6"
+      ]
+    },
+    {
+      "name": "node-addon-require-builtin-linux-x64-gnu",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-require-builtin-linux-x64-gnu@0.1.6"
+      ]
+    },
+    {
+      "name": "node-addon-require-builtin-win32-arm64-msvc",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-require-builtin-win32-arm64-msvc@0.1.6"
+      ]
+    },
+    {
+      "name": "node-addon-require-builtin-win32-ia32-msvc",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-require-builtin-win32-ia32-msvc@0.1.6"
+      ]
+    },
+    {
+      "name": "node-addon-require-builtin-win32-x64-msvc",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-require-builtin-win32-x64-msvc@0.1.6"
+      ]
+    },
+    {
+      "name": "node-addon-require-builtin",
+      "reasons": [
+        "Reviewed coupled runtime release: node-addon-require-builtin@0.1.6"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk-darwin-arm64",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk-darwin-arm64@0.3.263"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk-darwin-x64",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk-darwin-x64@0.3.263"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk-linux-arm64-musl",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk-linux-arm64-musl@0.3.263"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk-linux-arm64",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk-linux-arm64@0.3.263"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk-linux-x64-musl",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk-linux-x64-musl@0.3.263"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk-linux-x64",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk-linux-x64@0.3.263"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk-win32-arm64",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk-win32-arm64@0.3.263"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk-win32-x64",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk-win32-x64@0.3.263"
+      ]
+    },
+    {
+      "name": "@anthropic-ai/claude-agent-sdk",
+      "reasons": [
+        "Reviewed coupled runtime release: @anthropic-ai/claude-agent-sdk@0.3.263"
+      ]
+    },
+    {
+      "name": "@openai/codex",
+      "reasons": [
+        "Reviewed coupled runtime release: @openai/codex@0.153.4||0.153.4-darwin-arm64||0.153.4-darwin-x64||0.153.4-linux-arm64||0.153.4-linux-x64||0.153.4-win32-arm64||0.153.4-win32-x64"
+      ]
+    },
+    {
+      "name": "@trycua/cua-driver-darwin-arm64",
+      "reasons": [
+        "Reviewed coupled runtime release: @trycua/cua-driver-darwin-arm64@0.28.0"
+      ]
+    },
+    {
+      "name": "@trycua/cua-driver-darwin-x64",
+      "reasons": [
+        "Reviewed coupled runtime release: @trycua/cua-driver-darwin-x64@0.28.0"
+      ]
+    },
+    {
+      "name": "@trycua/cua-driver-linux-arm64-gnu",
+      "reasons": [
+        "Reviewed coupled runtime release: @trycua/cua-driver-linux-arm64-gnu@0.28.0"
+      ]
+    },
+    {
+      "name": "@trycua/cua-driver-linux-x64-gnu",
+      "reasons": [
+        "Reviewed coupled runtime release: @trycua/cua-driver-linux-x64-gnu@0.28.0"
+      ]
+    },
+    {
+      "name": "@trycua/cua-driver-win32-arm64-msvc",
+      "reasons": [
+        "Reviewed coupled runtime release: @trycua/cua-driver-win32-arm64-msvc@0.28.0"
+      ]
+    },
+    {
+      "name": "@trycua/cua-driver-win32-x64-msvc",
+      "reasons": [
+        "Reviewed coupled runtime release: @trycua/cua-driver-win32-x64-msvc@0.28.0"
+      ]
+    },
+    {
+      "name": "@trycua/cua-driver",
+      "reasons": [
+        "Reviewed coupled runtime release: @trycua/cua-driver@0.28.0"
+      ]
+    },
+    {
+      "name": "xlsx",
+      "reasons": [
+        "Nonstandard source: https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
+      ]
+    },
+    {
+      "name": "typescript",
+      "reasons": [
+        "Upstream explicit compatibility range: >=5 <7"
+      ]
+    }
+  ],
+  "scope": "Compatible registry updates within declared ranges; ordinary exact pins move within the same compatible release line and remain exact. Node and pnpm are explicitly migrated. Major/API-breaking upgrades and patched/native groups require separate validation."
+}

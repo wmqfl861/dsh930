@@ -1,3 +1,4 @@
+/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
 /** Scheduling policy for post-merge native runtime carriers and Wine. */
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -28,7 +29,7 @@ interface Workflow {
 }
 
 function workflow(name: string): Workflow {
-  return load(readFileSync(resolve(root, '.github/workflows', name), 'utf8')) as Workflow
+  return load(readFileSync(resolve(root, '.github/upstream-workflows', name), 'utf8')) as Workflow
 }
 
 function commands(job: Job): string[] {

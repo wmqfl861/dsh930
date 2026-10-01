@@ -477,7 +477,7 @@ describe('readTextForDiff', () => {
             read: handle.read.bind(handle),
             async stat(...statArgs: Parameters<typeof handle.stat>) {
               const info = await handle.stat(...statArgs)
-              return Object.assign(info, { isFile: () => false })
+              return info === undefined ? undefined : Object.assign(info, { isFile: () => false })
             },
           }
         },

@@ -1,3 +1,4 @@
+/** These regressions validate the preserved upstream workflow templates, not dsh930 CI. */
 /** Release rehearsal routing and persistent-runner isolation, without executing release builds. */
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -25,7 +26,7 @@ interface Workflow {
 }
 
 function workflow(file: string): Workflow {
-  return load(readFileSync(resolve(root, '.github/workflows', file), 'utf8')) as Workflow
+  return load(readFileSync(resolve(root, '.github/upstream-workflows', file), 'utf8')) as Workflow
 }
 
 // This canonical-case corpus has matching Actions/JavaScript comparison results.

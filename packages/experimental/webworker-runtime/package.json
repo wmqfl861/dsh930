@@ -28,14 +28,14 @@
   },
   "license": "MIT",
   "dependencies": {
+    "@deepseek-ai/dsh-client-web": "workspace:*",
     "@deepseek-ai/dsh-util-crypto": "workspace:*",
-    "@noble/hashes": "^2.3.0",
+    "@noble/hashes": "^2.4.0",
     "@yarnpkg/parsers": "^3.1.0",
-    "acorn": "^8.17.0",
+    "acorn": "^8.18.0",
     "buffer": "^6.0.3",
-    "picomatch": "^4.0.4",
-    "readable-stream": "^4.7.0",
-    "@deepseek-ai/dsh-client-web": "workspace:*"
+    "picomatch": "^4.0.7",
+    "readable-stream": "^4.7.0"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "workspace:~",
@@ -57,13 +57,13 @@
     "@deepseek-ai/dsh-sandbox-local": "workspace:*",
     "@deepseek-ai/dsh-sandbox-policy": "workspace:*",
     "@deepseek-ai/dsh-session": "workspace:*",
-    "@deepseek-ai/dsh-session-projection": "workspace:*",
     "@deepseek-ai/dsh-session-persistence-jsonl": "workspace:*",
+    "@deepseek-ai/dsh-session-projection": "workspace:*",
     "@deepseek-ai/dsh-subagent": "workspace:*",
     "@deepseek-ai/dsh-subprocess-local": "workspace:*",
     "@deepseek-ai/node-addon-system": "workspace:~",
     "@types/picomatch": "^3.0.2",
-    "@types/readable-stream": "^4.0.24",
+    "@types/readable-stream": "^4.0.25",
     "chokidar": "^5.0.0"
   },
   "files": [

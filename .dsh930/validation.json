@@ -1,0 +1,240 @@
+{
+  "node": "v24.21.0",
+  "pnpm": "12.8.1",
+  "sourceCommit": "ceb52ab476077c4d0e3676453181b25ffcd6beae",
+  "runId": "36813104476",
+  "steps": {
+    "resolve": "success",
+    "install": "success",
+    "build": "success",
+    "notices": "success",
+    "focused": "success",
+    "lint": "failure",
+    "smoke": "failure"
+  },
+  "developmentReady": false,
+  "fullSuite": "failure",
+  "ready": false,
+  "testShards": [
+    {
+      "shard": 1,
+      "success": false,
+      "passed": 8079,
+      "failed": 1,
+      "pending": 74,
+      "total": 8154,
+      "failedSuites": [
+        {
+          "path": "packages/boot/plugin-manager/tests/manager.spec.ts",
+          "assertions": [
+            "runs a real pnpm dependency script only after approval and retry"
+          ],
+          "message": ""
+        },
+        {
+          "path": "packages/client/ui-renderer/tests/reconnect.client.spec.tsx",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/client/ui-session/tests/status-controller.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/api/session-controller/tests/inbox-projection.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/test-support/client-runtime/tests/assembly-bundle-roster.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/test-support/client-runtime/tests/assembly-vitest.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        }
+      ]
+    },
+    {
+      "shard": 2,
+      "success": false,
+      "passed": 8726,
+      "failed": 4,
+      "pending": 53,
+      "total": 8783,
+      "failedSuites": [
+        {
+          "path": "packages/workflow/workflow-ptc/tests/workflow-ptc.spec.ts",
+          "assertions": [
+            "dsh-workflow-ptc process failure and pending child cleanup waits for a late provider publication to release its file after cancellation"
+          ],
+          "message": ""
+        },
+        {
+          "path": "packages/api/session-controller/tests/manager.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/api/session-controller/tests/reference-ownership.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/api/workspace-controller/tests/transport.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/client/ui-settings-general/tests/apply.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/client/ui-shortcuts/tests/commands.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/workflow/workflow-ptc/tests/source-runtime.compat.spec.ts",
+          "assertions": [
+            "runs the default workflow config through the source PTC runtime",
+            "enforces the Session file policy read-only for direct Node writes",
+            "enforces the Session file policy workspace-write for direct Node writes"
+          ],
+          "message": ""
+        }
+      ]
+    },
+    {
+      "shard": 3,
+      "success": false,
+      "passed": 14130,
+      "failed": 1,
+      "pending": 37,
+      "total": 14168,
+      "failedSuites": [
+        {
+          "path": "packages/api/session-controller/tests/client-apply.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/api/session-controller/tests/sessions-service.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/client/ui-settings-account/tests/apply.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/client/ui-settings-general/tests/shell.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/subagent/subagent-claude-code/tests/subagent-claude-code.spec.ts",
+          "assertions": [
+            "task admission and package contracts ships one independently installable provider-only Bundle patch"
+          ],
+          "message": ""
+        },
+        {
+          "path": "packages/test-support/client-runtime/tests/assembly-modules.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/test-support/client-runtime/tests/assembly-remote-proxies.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        }
+      ]
+    },
+    {
+      "shard": 4,
+      "success": false,
+      "passed": 7789,
+      "failed": 17,
+      "pending": 23,
+      "total": 7829,
+      "failedSuites": [
+        {
+          "path": "scripts/primary-runtime/prepare.spec.ts",
+          "assertions": [
+            "keeps carrier pnpm versions aligned with the shared payload build"
+          ],
+          "message": ""
+        },
+        {
+          "path": "apps/desktop/tests/macos-notarization-proxy.spec.ts",
+          "assertions": [
+            "restores both original proxies after settled work (failure=false)",
+            "restores both original proxies after settled work (failure=true)",
+            "disables originally empty proxies without writing empty endpoints (space=false)",
+            "disables originally empty proxies without writing empty endpoints (space=true)",
+            "retains an empty-proxy recovery record after failed disabling and retries it",
+            "keeps the recovery record when disabling an originally empty proxy has no effect",
+            "does not steal a live lock and holds the proxy until concurrent work drains",
+            "excludes both operations across processes and releases ownership after forced exit",
+            "restores partial setup and never calls Apple after a system write failure",
+            "rejects unpreservable pac settings before mutation",
+            "rejects unpreservable authenticated settings before mutation",
+            "retains recovery data after failed restoration, rejects live owners, then recovers after owner exit",
+            "rejects malformed saved state without invoking host commands",
+            "defers interruption until work settles and removes its signal listeners after restoration",
+            "retains both the Apple failure and restoration failure"
+          ],
+          "message": ""
+        },
+        {
+          "path": "packages/api/session-controller/tests/projection-store.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/api/session-controller/tests/session-pending-submissions.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/api/session-controller/tests/session.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/client/ui-directory-picker-native/tests/desktop-picker.client.spec.tsx",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/test-support/client-runtime/tests/assembly-dependencies.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/test-support/client-runtime/tests/assembly-test-client-node.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/test-support/client-runtime/tests/assembly-test-client.client.spec.ts",
+          "assertions": [],
+          "message": "client-test-runtime: cannot resolve plugin package @deepseek-ai/dsh-web-app from @deepseek-ai/dsh-base, @deepseek-ai/dsh-web-app"
+        },
+        {
+          "path": "packages/typert/generator/tests/type-model.spec.ts",
+          "assertions": [
+            "WorkspaceAnalyzer builds independent face models with an explicit cross-face type graph"
+          ],
+          "message": ""
+        }
+      ]
+    }
+  ]
+}
