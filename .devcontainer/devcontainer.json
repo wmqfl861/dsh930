@@ -1,24 +1,39 @@
 {
-  "name": "dsh930 — Node 24",
+  "name": "dsh930 — reproducible Node 24 development",
   "build": {
     "dockerfile": "Dockerfile",
     "context": ".."
   },
   "remoteUser": "node",
   "containerEnv": {
-    "DSH_TELEMETRY_DISABLED": "1"
+    "DSH_TELEMETRY_DISABLED": "1",
+    "NODE_OPTIONS": "--max-old-space-size=6144"
   },
   "hostRequirements": {
     "cpus": 4,
     "memory": "16gb",
     "storage": "32gb"
   },
-  "postCreateCommand": "pnpm install --frozen-lockfile && pnpm run build",
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  "waitFor": "postCreateCommand",
   "forwardPorts": [3080],
   "portsAttributes": {
     "3080": {
-      "label": "dsh930 Web UI",
-      "onAutoForward": "notify"
+      "label": "dsh930 Web UI (authenticated)",
+      "onAutoForward": "notify",
+      "visibility": "private"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "typescript.tsdk": "node_modules/typescript/lib",
+        "files.watcherExclude": {
+          "**/node_modules/**": true,
+          "**/.pnpm-store/**": true,
+          "**/.git/objects/**": true
+        }
+      }
     }
   }
 }

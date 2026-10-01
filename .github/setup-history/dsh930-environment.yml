@@ -1,0 +1,301 @@
+name: dsh930 development environment
+
+on:
+  push:
+    branches: [dev/node24]
+    paths:
+      - .github/workflows/dsh930-environment.yml
+      - .dsh930/upgrade.mjs
+      - .dsh930/node24-compat.patch
+      - '**/package.json'
+      - pnpm-workspace.yaml
+      - pnpm-lock.yaml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dsh930-development-v2
+  cancel-in-progress: false
+
+env:
+  DSH_TELEMETRY_DISABLED: '1'
+  NODE_OPTIONS: --max-old-space-size=6144
+  CI: 'true'
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    outputs:
+      built: ${{ steps.build.outcome }}
+      resolved: ${{ steps.resolve.outcome }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - name: Install the reviewed package manager
+        run: |
+          npm install --global pnpm@12.8.1
+          echo 'DSH930_PNPM_VERSION=12.8.1' >> "$GITHUB_ENV"
+          echo "PNPM_CONFIG_STORE_DIR=$GITHUB_WORKSPACE/.pnpm-store" >> "$GITHUB_ENV"
+          mkdir -p "$RUNNER_TEMP/results"
+      - name: Apply source migrations and retain the upstream Vite 8 test runtime
+        run: |
+          set -euo pipefail
+          if git apply --reverse --check .dsh930/node24-compat.patch 2>/dev/null; then
+            echo 'Node 24 source migration is already present.'
+          else
+            git apply --check .dsh930/node24-compat.patch
+            git apply .dsh930/node24-compat.patch
+          fi
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          // The upstream root test graph used Vite 8 as an implicit peer.
+          // Declare it here so pnpm cannot substitute an application's Vite 6.
+          pkg.devDependencies.vite ??= '^8.0.16';
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          JS
+      - name: Resolve compatible dependency updates
+        id: resolve
+        continue-on-error: true
+        run: |
+          node .dsh930/upgrade.mjs > "$RUNNER_TEMP/results/upgrade.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/upgrade.log"; exit 1; }
+      - name: Install the frozen upgraded lockfile
+        id: install
+        if: steps.resolve.outcome == 'success'
+        continue-on-error: true
+        run: |
+          pnpm install --frozen-lockfile > "$RUNNER_TEMP/results/install.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/install.log"; exit 1; }
+      - name: Build native, Host, Client and Web artifacts
+        id: build
+        if: steps.install.outcome == 'success'
+        continue-on-error: true
+        run: |
+          pnpm run build > "$RUNNER_TEMP/results/build.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/build.log"; exit 1; }
+      - name: Refresh third-party declarations from installed packages
+        id: notices
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          pnpm run gen-third-party-notices > "$RUNNER_TEMP/results/notices.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/notices.log"; exit 1; }
+      - name: Check the migrated Node and test-runner interfaces
+        id: focused
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          node node_modules/vitest/vitest.mjs run packages/fs/fs-local/tests/fsio.spec.ts packages/experimental/browser-use-stagehand-native/tests/worker-protocol.spec.ts packages/experimental/browser-use-stagehand-native/tests/native.spec.ts packages/experimental/webworker-runtime/tests/node/shim-diff.spec.ts packages/experimental/webworker-runtime/tests/node/path-diff.spec.ts --maxWorkers=2 > "$RUNNER_TEMP/results/focused.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/focused.log"; exit 1; }
+      - name: Lint the generated-contract source tree
+        id: lint
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          pnpm run lint:contracts-ready > "$RUNNER_TEMP/results/lint.log" 2>&1 || { tail -100 "$RUNNER_TEMP/results/lint.log"; exit 1; }
+      - name: Start the Web UI without making a model API call
+        id: smoke
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        env:
+          DSH_HOME: ${{ runner.temp }}/dsh930-smoke-home
+        run: |
+          set -euo pipefail
+          pnpm dsh web --no-open --port 3080 > "$RUNNER_TEMP/results/web.log" 2>&1 &
+          server=$!
+          trap 'kill "$server" 2>/dev/null || true' EXIT
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3080/ > "$RUNNER_TEMP/results/index.html"; then
+              echo 'Web UI returned HTTP 200'
+              exit 0
+            fi
+            kill -0 "$server" 2>/dev/null || break
+            sleep 2
+          done
+          tail -100 "$RUNNER_TEMP/results/web.log"
+          exit 1
+      - name: Record preparation outcomes
+        if: always()
+        env:
+          RESOLVE: ${{ steps.resolve.outcome }}
+          INSTALL: ${{ steps.install.outcome }}
+          BUILD: ${{ steps.build.outcome }}
+          NOTICES: ${{ steps.notices.outcome }}
+          FOCUSED: ${{ steps.focused.outcome }}
+          LINT: ${{ steps.lint.outcome }}
+          SMOKE: ${{ steps.smoke.outcome }}
+        run: |
+          mkdir -p .dsh930 "$RUNNER_TEMP/results"
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const steps = Object.fromEntries(['RESOLVE','INSTALL','BUILD','NOTICES','FOCUSED','LINT','SMOKE'].map(key => [key.toLowerCase(), process.env[key] || 'not-run']));
+          const report = { node: process.version, pnpm: process.env.DSH930_PNPM_VERSION, sourceCommit: process.env.GITHUB_SHA, runId: process.env.GITHUB_RUN_ID, steps, developmentReady: ['install','build','focused','smoke'].every(key => steps[key] === 'success'), fullSuite: 'pending', ready: false };
+          fs.writeFileSync('.dsh930/validation.json', JSON.stringify(report, null, 2) + '\n');
+          console.log(JSON.stringify(report, null, 2));
+          JS
+          cp .dsh930/*.json "$RUNNER_TEMP/results/"
+          git diff --binary > "$RUNNER_TEMP/results/changes.patch"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-fast-results
+          path: ${{ runner.temp }}/results/
+          retention-days: 7
+      - name: Export the installed workspace separately from its package cache
+        if: always()
+        run: |
+          set -euo pipefail
+          tar --exclude='./.git' --exclude='./.pnpm-store' --exclude='./.env' --exclude='./.env.*' --exclude='./apps/desktop/.env.windows' --exclude='./apps/desktop/.env.macos' -I 'gzip -1' -cf "$RUNNER_TEMP/workspace.tar.gz" .
+          sha256sum "$RUNNER_TEMP/workspace.tar.gz" > "$RUNNER_TEMP/results/workspace-sha256.txt"
+          if test -d .pnpm-store; then
+            tar -I 'gzip -1' -cf "$RUNNER_TEMP/package-store.tar.gz" .pnpm-store
+          fi
+          node_root="$(dirname "$(dirname "$(readlink -f "$(command -v node)")")")"
+          tar -I 'gzip -1' -cf "$RUNNER_TEMP/results/node24-pnpm.tar.gz" -C "$node_root" .
+          if test -d "$HOME/.cache/pnpm/v11/metadata"; then
+            tar -czf "$RUNNER_TEMP/results/pnpm-metadata.tar.gz" -C "$HOME/.cache/pnpm" v11/metadata
+          fi
+          git bundle create "$RUNNER_TEMP/results/repository.bundle" --all
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-installed-workspace
+          path: ${{ runner.temp }}/workspace.tar.gz
+          compression-level: 0
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-package-store
+          path: ${{ runner.temp }}/package-store.tar.gz
+          compression-level: 0
+          retention-days: 7
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-validation-results
+          path: ${{ runner.temp }}/results/
+          compression-level: 0
+          retention-days: 7
+
+  test:
+    needs: prepare
+    if: needs.prepare.outputs.built == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - run: npm install --global pnpm@12.8.1
+      - uses: actions/download-artifact@v4
+        with:
+          name: dsh930-installed-workspace
+          path: ${{ runner.temp }}/workspace
+      - name: Restore the exact built source and dependencies
+        run: tar -xzf "$RUNNER_TEMP/workspace/workspace.tar.gz" -C "$GITHUB_WORKSPACE"
+      - name: Run the complete unit inventory in independent shards
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/tests"
+          node node_modules/vitest/vitest.mjs run --maxWorkers=2 --shard="$SHARD/4" --reporter=default --reporter=json --outputFile="$RUNNER_TEMP/tests/result.json" > "$RUNNER_TEMP/tests/test.log" 2>&1 || { tail -130 "$RUNNER_TEMP/tests/test.log"; exit 1; }
+          tail -25 "$RUNNER_TEMP/tests/test.log"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-test-shard-${{ matrix.shard }}
+          path: ${{ runner.temp }}/tests/
+          retention-days: 7
+
+  publish:
+    needs: [prepare, test]
+    if: always() && needs.prepare.outputs.resolved == 'success'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: dsh930-fast-results
+          path: ${{ runner.temp }}/prepared
+      - uses: actions/download-artifact@v4
+        if: needs.test.result != 'skipped'
+        with:
+          pattern: dsh930-test-shard-*
+          path: ${{ runner.temp }}/shards
+      - name: Apply the tested dependency and source changes
+        run: |
+          git apply --check "$RUNNER_TEMP/prepared/changes.patch"
+          git apply "$RUNNER_TEMP/prepared/changes.patch"
+          cp "$RUNNER_TEMP/prepared/dependency-upgrade.json" .dsh930/
+          cp "$RUNNER_TEMP/prepared/validation.json" .dsh930/
+      - name: Preserve exact test outcomes, including failures
+        env:
+          FULL_SUITE_RESULT: ${{ needs.test.result }}
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          import path from 'node:path';
+          const report = JSON.parse(fs.readFileSync('.dsh930/validation.json', 'utf8'));
+          report.fullSuite = process.env.FULL_SUITE_RESULT;
+          report.testShards = [];
+          for (let shard = 1; shard <= 4; shard++) {
+            const file = path.join(process.env.RUNNER_TEMP, 'shards', `dsh930-test-shard-${shard}`, 'result.json');
+            if (!fs.existsSync(file)) { report.testShards.push({ shard, status: 'no-complete-report' }); continue; }
+            const r = JSON.parse(fs.readFileSync(file, 'utf8'));
+            report.testShards.push({ shard, success: r.success, passed: r.numPassedTests, failed: r.numFailedTests, pending: r.numPendingTests, total: r.numTotalTests, failedSuites: r.testResults.filter(s => s.status === 'failed').map(s => ({ path: path.relative(process.cwd(), s.name), assertions: s.assertionResults.filter(t => t.status === 'failed').map(t => t.fullName), message: s.message })) });
+          }
+          report.ready = Object.values(report.steps).every(value => value === 'success') && report.fullSuite === 'success' && report.testShards.every(shard => shard.success === true);
+          fs.writeFileSync('.dsh930/validation.json', JSON.stringify(report, null, 2) + '\n');
+          console.log(JSON.stringify(report, null, 2));
+          JS
+      - name: Save the actual development candidate without hiding failed checks
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          git config user.name 'dsh930 setup'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --update
+          git add .dsh930/dependency-upgrade.json .dsh930/validation.json
+          git diff --cached --check
+          git -c core.hooksPath=/dev/null commit -m 'build: import Node 24 dependency upgrades with recorded validation outcomes'
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push origin HEAD:refs/heads/dev/node24
+          mkdir -p "$RUNNER_TEMP/final"
+          git rev-parse HEAD > "$RUNNER_TEMP/final/commit.txt"
+          git bundle create "$RUNNER_TEMP/final/repository.bundle" --all
+          cp .dsh930/validation.json .dsh930/dependency-upgrade.json "$RUNNER_TEMP/final/"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-final-checkpoint
+          path: ${{ runner.temp }}/final/
+          compression-level: 0
+          retention-days: 7
+      - name: Keep CI red unless every check passed
+        run: node --input-type=module -e "import fs from 'node:fs'; if (!JSON.parse(fs.readFileSync('.dsh930/validation.json', 'utf8')).ready) process.exit(1);"

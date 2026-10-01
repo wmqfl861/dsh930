@@ -1,5 +1,7 @@
 # DeepSeek Harness
 
+> **dsh930 development:** [Cloud environment and acceptance guide (Chinese)](DEVELOPMENT.zh.md), using Node 24 and frozen dependencies.
+
 English | [中文](README.zh.md)
 
 DeepSeek Harness (`dsh`) is an open-source agent harness developed by [DeepSeek AI](https://deepseek.com).
