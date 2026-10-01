@@ -6,6 +6,7 @@ on:
     paths:
       - .github/workflows/dsh930-environment.yml
       - .dsh930/upgrade.mjs
+      - .dsh930/node24-compat.patch
       - '**/package.json'
       - pnpm-workspace.yaml
       - pnpm-lock.yaml
@@ -34,20 +35,27 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-node@v6
         with:
-          node-version: '24'
-          check-latest: true
+          node-version: '24.21.0'
           package-manager-cache: false
-      - name: Install a resolved stable package manager
+      - name: Install the reviewed package manager
         run: |
           set -euo pipefail
-          version="$(npm view pnpm dist-tags.latest)"
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          version=12.8.1
           npm install --global "pnpm@$version"
           echo "DSH930_PNPM_VERSION=$version" >> "$GITHUB_ENV"
           echo "PNPM_CONFIG_STORE_DIR=$GITHUB_WORKSPACE/.pnpm-store" >> "$GITHUB_ENV"
           mkdir -p "$RUNNER_TEMP/dsh930-results"
           node --version
           cc --version | head -1
+      - name: Apply the reviewed source compatibility migration
+        run: |
+          set -euo pipefail
+          if git apply --reverse --check .dsh930/node24-compat.patch 2>/dev/null; then
+            echo 'Compatibility migration is already present.'
+          else
+            git apply --check .dsh930/node24-compat.patch
+            git apply .dsh930/node24-compat.patch
+          fi
       - name: Resolve Node 24 types and dependency upgrades
         id: resolve
         continue-on-error: true
@@ -122,6 +130,14 @@ jobs:
           fs.writeFileSync('.dsh930/validation.json', JSON.stringify(report, null, 2) + '\n');
           console.log(JSON.stringify(report, null, 2));
           JS
+          cp .dsh930/*.json "$RUNNER_TEMP/dsh930-results/"
+          git diff --binary > "$RUNNER_TEMP/dsh930-results/changes.patch"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dsh930-fast-results
+          path: ${{ runner.temp }}/dsh930-results/
+          retention-days: 7
       - name: Commit only a validated environment to the development branch
         if: steps.resolve.outcome == 'success' && steps.install.outcome == 'success' && steps.build.outcome == 'success' && steps.test.outcome == 'success' && steps.lint.outcome == 'success' && steps.smoke.outcome == 'success'
         env:
@@ -130,7 +146,8 @@ jobs:
           set -euo pipefail
           git config user.name 'dsh930 setup'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- '**/package.json' package.json pnpm-lock.yaml pnpm-workspace.yaml .nvmrc .node-version .dsh930
+          git add --update
+          git add -- .nvmrc .node-version .dsh930
           git diff --cached --check
           git -c core.hooksPath=/dev/null commit -m 'build: validate Node 24 and updated workspace dependencies'
           auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
@@ -144,6 +161,9 @@ jobs:
           git bundle create "$RUNNER_TEMP/dsh930-results/repository.bundle" --all
           node_root="$(dirname "$(dirname "$(readlink -f "$(command -v node)")")")"
           tar -czf "$RUNNER_TEMP/dsh930-results/node24-pnpm.tar.gz" -C "$node_root" .
+          if test -d "$HOME/.cache/pnpm/v11/metadata"; then
+            tar -czf "$RUNNER_TEMP/dsh930-results/pnpm-metadata.tar.gz" -C "$HOME/.cache/pnpm" v11/metadata
+          fi
           git diff --binary > "$RUNNER_TEMP/dsh930-results/changes.patch"
           cp .dsh930/*.json "$RUNNER_TEMP/dsh930-results/" 2>/dev/null || true
           tar --exclude='./.git' --exclude='./.env' --exclude='./.env.*' --exclude='./apps/desktop/.env.windows' --exclude='./apps/desktop/.env.macos' -czf "$RUNNER_TEMP/dsh930-workspace.tar.gz" .
