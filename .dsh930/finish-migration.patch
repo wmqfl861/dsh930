@@ -1,0 +1,172 @@
+--- a/packages/experimental/webworker-runtime/src/node/builtin_modules/implemented/url.ts
++++ b/packages/experimental/webworker-runtime/src/node/builtin_modules/implemented/url.ts
+@@ -67,7 +67,9 @@
+ type NodeFace = Partial<Omit<typeof import('node:url'), 'URL' | 'URLSearchParams'>>
+   & Record<'URL' | 'URLSearchParams', unknown>
+ 
++const urlModule = {
++  fileURLToPath, pathToFileURL, resolve, URL: UrlClass, URLSearchParams: UrlSearchParamsClass,
++}
++
+ /** CommonJS default export: the members `require()` hands a caller of this module. */
+-export default {
+-  fileURLToPath, pathToFileURL, resolve, URL: UrlClass, URLSearchParams: UrlSearchParamsClass,
+-} satisfies NodeFace
++export default urlModule satisfies NodeFace
+--- a/packages/experimental/inspector/src/host/bridge/lifecycle.ts
++++ b/packages/experimental/inspector/src/host/bridge/lifecycle.ts
+@@ -21,7 +21,7 @@
+   }
+ 
+   constructor(private readonly worker: Worker) {
+-    worker.on('error', (error) => {
++    worker.on('error', (error: Error) => {
+       this.failure ??= error
+       this.failureResolution.resolve(error)
+       this.notifyUnexpectedExit()
+--- a/packages/experimental/inspector/tests/fixtures/client-source.host.ts
++++ b/packages/experimental/inspector/tests/fixtures/client-source.host.ts
+@@ -39,7 +39,7 @@
+     this.worker = worker
+     this.fiberUid = fiberUid
+     worker.on('message', (message: unknown) => { this.receive(message) })
+-    worker.on('error', (error) => { this.fail(error) })
++    worker.on('error', (error: Error) => { this.fail(error) })
+     worker.on('exit', (code) => {
+       if (!this.closed && code !== 0) this.fail(new Error(`Inspector Client fixture exited with code ${String(code)}`))
+     })
+--- a/apps/web/tests/connection-recovery.e2e.ts
++++ b/apps/web/tests/connection-recovery.e2e.ts
+@@ -79,7 +79,7 @@
+     await page.evaluate(() => new Promise<void>((resolve) => {
+       requestAnimationFrame(() => { requestAnimationFrame(() => { resolve() }) })
+     }))
+-    expect(await root!.evaluate(element => element.isConnected)).toBe(true)
++    expect(await root.evaluate(element => element.isConnected)).toBe(true)
+     expect(console.pageErrors).toEqual([])
+     if (activeSession) expect(await composer.textContent()).toBe(draft)
+   }
+--- a/apps/web/tests/shortcuts.e2e.ts
++++ b/apps/web/tests/shortcuts.e2e.ts
+@@ -194,7 +194,7 @@
+         expect(await dialog.getByRole('listitem').textContent()).toContain(locale === 'zh-CN' ? '展开／收起左侧栏' : 'Toggle left sidebar')
+       }
+       await page.keyboard.press(`${key}+Alt+Comma`)
+-      expect(await referenceNode!.evaluate(element => element.isConnected)).toBe(true)
++      expect(await referenceNode.evaluate(element => element.isConnected)).toBe(true)
+       expect(await page.getByRole('dialog').count()).toBe(2)
+       expect(await page.getByRole('searchbox').inputValue()).toBe('toggle left sidebar')
+       expect(await searchInput.evaluate(element => getComputedStyle(element).outlineStyle)).toBe('none')
+--- a/apps/web/tests/server-restart.e2e.ts
++++ b/apps/web/tests/server-restart.e2e.ts
+@@ -224,7 +224,7 @@
+   expect(errors).toEqual([])
+   expect(streamErrors).toEqual([])
+   for (const graph of graphs.slice(beforeGraphs)) expect(graph).toEqual(graphs[beforeGraphs - 1])
+-  expect(await originalRoot!.evaluate(element => element.isConnected)).toBe(true)
++  expect(await originalRoot.evaluate(element => element.isConnected)).toBe(true)
+   expect(await composer.textContent()).toBe(draft)
+   expect(await response.isVisible()).toBe(true)
+ 
+--- a/apps/web/tests/document-preview.e2e.ts
++++ b/apps/web/tests/document-preview.e2e.ts
+@@ -496,9 +496,9 @@
+     }
+     await layout.evaluate(node => node.parentNode!.removeChild(node))
+     await expectExcelLayout(excel)
+-    expect(await canvas!.evaluate(node => node.isConnected)).toBe(true)
++    expect(await canvas.evaluate(node => node.isConnected)).toBe(true)
+     expect(await excel.locator('.fortune-name-box').innerText()).toBe(selection)
+-    await canvas!.dispose()
++    await canvas.dispose()
+     expect(consoleErrors.pageErrors).toEqual([])
+   } finally {
+     try { await browser?.close() } finally { await scaffold.close() }
+--- a/apps/web/tests/client-plugin-live.e2e.ts
++++ b/apps/web/tests/client-plugin-live.e2e.ts
+@@ -266,7 +266,7 @@
+     await failure.getByRole('button', { name: '重试本页面同步' }).click()
+     await failure.getByText(/replacing bootstrap module .* requires a page reload/).waitFor()
+     await compareOrRefreshGolden(join(EXPECTED, 'bootstrap-rebuild.expected.md'), await captureStableAria(page, '[data-client-sync-failure]', scaffold.workspaceCwd), webSnapshotMode())
+-    expect(await originalInput!.evaluate(input => input.isConnected)).toBe(true)
++    expect(await originalInput.evaluate(input => input.isConnected)).toBe(true)
+     expect(await draft.inputValue()).toBe('unfinished-filter')
+     expect(scaffold.ctx.loader.ctx.fiber.uid).toBe(host)
+     expect(navigations).toBe(0)
+--- a/packages/core/agent-loop/tests/properties.spec.ts
++++ b/packages/core/agent-loop/tests/properties.spec.ts
+@@ -132,7 +132,7 @@
+           await ctx.fiber.dispose()
+         }
+       },
+-    ), { numRuns: 25, timeout: 2000 })
++    ), { numRuns: 25, plugins: [fc.timeout(2000)] })
+   })
+ 
+   it('sequential sends each get their own turn with increasing numbers', async () => {
+@@ -154,7 +154,7 @@
+           await ctx.fiber.dispose()
+         }
+       },
+-    ), { numRuns: 20, timeout: 2000 })
++    ), { numRuns: 20, plugins: [fc.timeout(2000)] })
+   })
+ 
+   it('mixed settled and same-tick sends preserve one turn per message', async () => {
+@@ -189,6 +189,6 @@
+           await ctx.fiber.dispose()
+         }
+       },
+-    ), { numRuns: 25, timeout: 3000 })
++    ), { numRuns: 25, plugins: [fc.timeout(3000)] })
+   })
+ })
+--- a/packages/telemetry/otel/package.json
++++ b/packages/telemetry/otel/package.json
+@@ -28,12 +28,12 @@
+   "license": "MIT",
+   "dependencies": {
+     "@opentelemetry/api": "^1.9.1",
+-    "@opentelemetry/api-logs": "^0.220.0",
++    "@opentelemetry/api-logs": "^0.222.0",
+     "@opentelemetry/core": "2.11.0",
+-    "@opentelemetry/otlp-exporter-base": "^0.220.0",
+-    "@opentelemetry/otlp-transformer": "^0.220.0",
++    "@opentelemetry/otlp-exporter-base": "^0.222.0",
++    "@opentelemetry/otlp-transformer": "^0.222.0",
+     "@opentelemetry/resources": "^2.11.0",
+-    "@opentelemetry/sdk-logs": "^0.220.0",
++    "@opentelemetry/sdk-logs": "^0.222.0",
+     "got": "^14.6.6"
+   },
+   "peerDependencies": {
+--- a/packages/host/product-telemetry-otel/package.json
++++ b/packages/host/product-telemetry-otel/package.json
+@@ -28,9 +28,9 @@
+   "license": "MIT",
+   "dependencies": {
+     "@deepseek-ai/schemastery": "workspace:~",
+-    "@opentelemetry/api-logs": "^0.220.0",
+-    "@opentelemetry/otlp-exporter-base": "^0.220.0",
+-    "@opentelemetry/sdk-logs": "^0.220.0"
++    "@opentelemetry/api-logs": "^0.222.0",
++    "@opentelemetry/otlp-exporter-base": "^0.222.0",
++    "@opentelemetry/sdk-logs": "^0.222.0"
+   },
+   "peerDependencies": {
+     "@deepseek-ai/cordis": "workspace:~",
+--- a/packages/session/session-telemetry-otel/package.json
++++ b/packages/session/session-telemetry-otel/package.json
+@@ -27,9 +27,9 @@
+   ],
+   "license": "MIT",
+   "dependencies": {
+-    "@opentelemetry/api-logs": "^0.220.0",
+-    "@opentelemetry/otlp-exporter-base": "^0.220.0",
+-    "@opentelemetry/sdk-logs": "^0.220.0",
++    "@opentelemetry/api-logs": "^0.222.0",
++    "@opentelemetry/otlp-exporter-base": "^0.222.0",
++    "@opentelemetry/sdk-logs": "^0.222.0",
+     "@deepseek-ai/schemastery": "workspace:~"
+   },
+   "peerDependencies": {
