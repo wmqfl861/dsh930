@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "briefRef": { "id": "fictional-story", "revision": 1 },
+  "assetRefs": [{ "id": "fictional-character-sheet", "revision": 1 }],
+  "relayProfile": {
+    "schemaVersion": 1,
+    "id": "unconfigured-test-relay",
+    "revision": 1,
+    "routingMode": "relay-only",
+    "endpoint": null,
+    "modelRef": null,
+    "capabilities": [],
+    "pricingRef": null
+  },
+  "shots": [
+    {
+      "id": "shot-01",
+      "revision": 1,
+      "briefRef": { "id": "fictional-story", "revision": 1 },
+      "sequence": 1,
+      "prompt": "TEST ONLY: Wide shot of a paper boat on a painted pond.",
+      "assetRefs": [],
+      "durationSeconds": null,
+      "aspectRatio": null
+    },
+    {
+      "id": "shot-02",
+      "revision": 1,
+      "briefRef": { "id": "fictional-story", "revision": 1 },
+      "sequence": 2,
+      "prompt": "TEST ONLY: A fictional character notices the paper boat.",
+      "assetRefs": [{ "id": "fictional-character-sheet", "revision": 1 }],
+      "durationSeconds": null,
+      "aspectRatio": null
+    },
+    {
+      "id": "shot-03",
+      "revision": 1,
+      "briefRef": { "id": "fictional-story", "revision": 1 },
+      "sequence": 3,
+      "prompt": "TEST ONLY: Close shot of the paper boat reaching a painted shore.",
+      "assetRefs": [],
+      "durationSeconds": null,
+      "aspectRatio": null
+    }
+  ]
+}
