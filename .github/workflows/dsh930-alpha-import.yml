@@ -1,0 +1,95 @@
+name: dsh930 Alpha v0.1 verified import
+
+on:
+  push:
+    branches: [ops/alpha-transfer-20261006]
+    paths: ['.dsh930/alpha-transfer/**', '.github/workflows/dsh930-alpha-import.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      CI: 'true'
+      DSH_TELEMETRY_DISABLED: '1'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Verify transport and isolate the reviewed base
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/alpha-results"
+          cat .dsh930/alpha-transfer/part-*.b64 > "$RUNNER_TEMP/payload.b64"
+          python3 - <<'PY'
+          import os, pathlib, hashlib, base64, lzma
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])
+          payload=(root/'payload.b64').read_bytes()
+          assert hashlib.sha256(payload).hexdigest()=='251f36e16e07b547e1c36940d52c7e10d6a2e4e9e864d8f6aff7bbbd690139b1'
+          patch=lzma.decompress(base64.b64decode(payload,validate=True))
+          assert hashlib.sha256(patch).hexdigest()=='3eccb567811a0ec2dc1c99582ec786cde345711897421a0ba73f401d0c53c9a6'
+          (root/'alpha.patch').write_bytes(patch)
+          PY
+          git checkout --detach 7a83cb480fb61a98483cb8c79a37388295a45237
+          git apply --check "$RUNNER_TEMP/alpha.patch"
+          git apply "$RUNNER_TEMP/alpha.patch"
+          git add alpha .dsh/skills
+          git diff --cached --check
+          python3 - <<'PY'
+          import subprocess
+          paths=subprocess.check_output(['git','diff','--cached','--name-only','-z']).decode().split('\0')
+          assert all(not p or p.startswith(('alpha/','.dsh/skills/alpha-')) for p in paths)
+          assert sum(bool(p) for p in paths)==38
+          PY
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.21.0
+          package-manager-cache: false
+      - name: Test the complete seven-pair runner without paid models
+        run: |
+          set -euo pipefail
+          node --version > "$RUNNER_TEMP/alpha-results/node.txt"
+          node --test alpha/tests/*.test.mjs > "$RUNNER_TEMP/alpha-results/unit.log" 2>&1 || { cat "$RUNNER_TEMP/alpha-results/unit.log"; exit 1; }
+          cat "$RUNNER_TEMP/alpha-results/unit.log"
+          node alpha/cli.mjs inspect > "$RUNNER_TEMP/alpha-results/inspect.json"
+          node alpha/cli.mjs fixture "$RUNNER_TEMP/alpha-fixtures" > "$RUNNER_TEMP/alpha-results/fixture.json"
+          code=0
+          node alpha/cli.mjs preflight > "$RUNNER_TEMP/alpha-results/preflight.json" || code=$?
+          test "$code" = 2
+          python3 - <<'PY'
+          import json, pathlib, hashlib
+          p=pathlib.Path('alpha/reports/validation.json')
+          for f,digest in json.loads(p.read_text())['sourceSha256'].items():
+              assert hashlib.sha256(pathlib.Path(f).read_bytes()).hexdigest()==digest, f
+          PY
+          git diff --exit-code
+      - name: Create the source commit and publish only a new feature branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          status=0
+          git ls-remote --exit-code --heads origin refs/heads/feat/alpha-team-v1 > "$RUNNER_TEMP/branch.txt" || status=$?
+          if [ "$status" != 2 ]; then
+            echo 'Refusing to replace an existing branch or proceed after a lookup failure.' >&2
+            exit 1
+          fi
+          git config user.name 'dsh Alpha setup'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git commit -m 'feat(alpha): add seven paired research roles, locked skills and native DSH runner'
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)"
+          git -c "http.https://github.com/.extraheader=AUTHORIZATION: basic $auth" push origin HEAD:refs/heads/feat/alpha-team-v1
+          git rev-parse HEAD > "$RUNNER_TEMP/alpha-results/commit.txt"
+          git bundle create "$RUNNER_TEMP/alpha-results/alpha-v1.bundle" HEAD
+          git archive --format=zip --output="$RUNNER_TEMP/alpha-results/alpha-v1-source.zip" HEAD alpha .dsh/skills
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: dsh930-alpha-v1-import-results
+          path: ${{ runner.temp }}/alpha-results/
+          retention-days: 14
+          if-no-files-found: error
