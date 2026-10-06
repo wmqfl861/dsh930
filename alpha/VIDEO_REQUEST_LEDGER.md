@@ -1,0 +1,29 @@
+# Offline video request ledger
+
+`VideoRequestLedger` in [video-request-ledger.mjs](video-request-ledger.mjs) records fixture reservations in one fixed shared directory. The operator must pre-create that directory durably; this module does not create or repair its parent hierarchy. Every cooperating process must use that directory and the same declared `{currency, limitUnits}`. Creating another directory creates another budget domain and defeats shared deduplication; callers must not allocate a directory per job. Currency is an explicit fixture label and units are nonnegative safe integers, with no default price, exchange rate, or billing conversion.
+
+## Inputs and identity
+
+`reserve` takes `{jobId, attemptId, operation, plan, shotId, reviewRecord, quote}`. The only operation is `generate-shot`. The quote is `{schemaVersion: 1, priceVersion, currency, estimatedUnits}` and requires an explicit fixture price version. `reviewRecord` is null or a separate valid review bound to the exact current plan. The existing [video validators](video-contracts.mjs) validate all plan and review fields. A pass review is declared metadata, never execution approval.
+
+The intent fingerprint binds the logical operation and canonical full selected-shot and relay-profile hashes, including revisions. Job and attempt ids, quote versions, estimated amounts and review declarations cannot create a second reservation for that intent. Each stored request additionally binds its exact plan, review and payload hashes. Assets are bound by their declared references and revisions; the ledger does not read asset bytes or verify that an unchanged asset reference still names unchanged content.
+
+The same job id and exact payload returns the existing record. Changed payload under that id fails. A new job for an existing intent is recorded as an alias without changing the first reservation or starting another attempt. An attempt id binds all immutable request fields except the job alias; changed quotes or reviews also require a different attempt id, which still cannot evade intent deduplication. An alias returns the canonical record and its state, not permission to execute. Changing unrelated plan content can change the plan hash without changing the selected-shot intent; both original bindings remain recorded rather than being silently overwritten.
+
+## State and accounting
+
+Reservations start at `reserved`. `markPossiblySubmitted(jobId)` persists the uncertainty marker before a future executor could submit anything. `markUnknown(jobId)` conservatively records an uncertain outcome. Both states hold the entire estimated reservation. Repeated calls for the exact original job return that state; new jobs or attempts for the unresolved intent fail, even with a new pass review or a zero-unit quote. There is no automatic retry, refund, timeout release or reconciliation mutator.
+
+`cancelPreSubmit(jobId, {kind: 'confirmed-pre-submit', reference})` only releases a record still in `reserved`. The ledger's state and the caller's evidence reference record that assertion; evidence authenticity is not independently verified. An executor that submits before durably marking uncertainty would violate this API's required ordering. Cancelled intents remain deduplicated and cannot be restarted through an alias. This conservative slice provides no repeat-generation or manual override path.
+
+`snapshot()` returns detached records, held `reservedUnits`, and `settledUnits: 0` because no settlement API exists. Estimated and actual amounts are separate: every record's `actualUsage` stays `{status: 'unknown', units: null}`, including cancelled reservations. Zero settled units is not zero provider cost. Reserved plus settled fixture units cannot exceed the declared cap; this does not bound real bills or prove that an estimate matches a provider charge.
+
+## Persistence and failure
+
+Transactions serialize within an instance and acquire the fixed `ledger.lock` with exclusive creation across processes. Lock contention returns `LEDGER_LOCKED` immediately. It never waits, retries, steals an old lock or assumes a dead process made a request safe to repeat. Budget checks, deduplication, state changes and persistence occur under that same lock.
+
+`ledger.json` stores validated data and a canonical checksum. Writes use an exclusively created `ledger.pending`, file fsync, atomic rename and directory fsync before success. A synced initialization marker makes missing ledger data an error rather than a fresh budget. Reads revalidate versions, hashes, aliases, currency, state and accounting. Corruption, incompatible configuration, unresolved temporary files and uncertain I/O preserve failure evidence and fail closed. A crashed writer leaves its lock; even a complete old-or-new ledger does not authorize automatic lock deletion. Operator investigation must preserve and reconcile evidence outside this module. The checksum detects accidental drift, not malicious rewriting. Removing the whole directory or both the data and initialization marker defeats local history; protecting storage and backups belongs to the operator.
+
+Use a trusted shared local filesystem with working exclusive creation, atomic rename and fsync. This module is not a multi-machine database or a filesystem security boundary. Filesystem or hardware durability limitations remain applicable. It cannot enforce remote idempotency, server exactly-once execution, provider cancellation, refunds, actual usage, billing correctness or authorization. All results retain `mode: 'offline-fixture'`, `generationPermitted: false` and `liveExecutionEnabled: false`; it contains no network transport, credential reader, SDK, subprocess or execution callback.
+
+Run `node --test alpha/tests/video-request-ledger.test.mjs` for fixture, persistence, lock, crash and independent-process race coverage. These tests use synthetic plans and units, never paid media calls.
