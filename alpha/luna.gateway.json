@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "baseURL": "http://154.89.153.24:8080/v1",
+  "model": "gpt-6-luna/max",
+  "api": "openai-responses",
+  "apiKeyEnv": "ALPHA_SMOKE_API_KEY",
+  "allowInsecureHttp": true,
+  "executionPurpose": "single-model-smoke"
+}
