@@ -1,9 +1,11 @@
 {
-  "schemaVersion": 1,
-  "baseURL": "http://154.89.153.24:8080/v1",
-  "model": "gpt-6-luna/max",
+  "schemaVersion": 2,
+  "baseURL": "https://sub2api.154.89.153.24.sslip.io/v1",
+  "model": "gpt-6-luna",
+  "reasoningEffort": "max",
+  "stream": true,
+  "maxOutputTokens": 4096,
   "api": "openai-responses",
   "apiKeyEnv": "ALPHA_SMOKE_API_KEY",
-  "allowInsecureHttp": true,
   "executionPurpose": "single-model-smoke"
 }

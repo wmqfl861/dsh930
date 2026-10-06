@@ -4,57 +4,109 @@ on:
     branches: [feat/alpha-luna-smoke]
     paths: ['alpha/**', '.github/workflows/dsh930-luna-check.yml']
   workflow_dispatch:
+    inputs:
+      run_live:
+        description: 'Run one bounded live test (at most 5 inference requests; no team run)'
+        type: boolean
+        default: false
+      max_usd:
+        description: 'Reservation ceiling in USD, no more than 0.25'
+        type: string
+        default: '0.25'
+      input_usd_per_million:
+        description: 'Verified maximum gateway input rate; leave empty to block spending'
+        type: string
+        default: ''
+      output_usd_per_million:
+        description: 'Verified maximum gateway output rate; leave empty to block spending'
+        type: string
+        default: ''
 permissions:
   contents: read
+concurrency:
+  group: luna-check-${{ github.ref }}
+  cancel-in-progress: false
 jobs:
-  luna:
+  offline:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v6
         with:
           persist-credentials: false
-          fetch-depth: 0
       - uses: actions/setup-node@v6
         with:
           node-version: 24.21.0
           package-manager-cache: false
-      - name: Verify configuration and regression tests
+      - name: Alpha and offline wire regressions (no model credentials)
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/luna-results"
-          node --version > "$RUNNER_TEMP/luna-results/node.txt"
-          node --test alpha/tests/*.test.mjs | tee "$RUNNER_TEMP/luna-results/tests.log"
+          mkdir -p .artifacts/luna-repair
+          node --test alpha/tests/*.test.mjs | tee .artifacts/luna-repair/alpha.log
+          node --test .devcontainer/check-env.test.mjs | tee .artifacts/luna-repair/config.log
           git diff --exit-code
-          git rev-parse HEAD > "$RUNNER_TEMP/luna-results/source-commit.txt"
-      - name: Check new module lint explicitly
+          git rev-parse HEAD > .artifacts/luna-repair/source-commit.txt
+      - name: Explicit MJS lint
         run: |
           set -euo pipefail
           npm install --prefix "$RUNNER_TEMP/alpha-lint" --ignore-scripts --no-audit --no-fund oxlint@1.86.0
-          node "$RUNNER_TEMP/alpha-lint/node_modules/oxlint/bin/oxlint" -c alpha/oxlint.json --no-ignore alpha --threads 1 | tee "$RUNNER_TEMP/luna-results/lint.log"
-      - name: Export exact tested source without credentials or runtime files
-        run: |
-          git bundle create "$RUNNER_TEMP/luna-source.bundle" HEAD
-          git archive --format=zip --output="$RUNNER_TEMP/luna-source.zip" HEAD alpha .dsh/skills .github/workflows/dsh930-luna-check.yml
-      - uses: actions/upload-artifact@v7
-        with:
-          name: luna-tested-source
-          path: |
-            ${{ runner.temp }}/luna-source.bundle
-            ${{ runner.temp }}/luna-source.zip
-          retention-days: 7
-      - name: Check user gateway and run inference only with a configured repository Secret
-        env:
-          ALPHA_SMOKE_API_KEY: ${{ secrets.ALPHA_SMOKE_API_KEY }}
-        run: node alpha/luna-smoke.mjs "$RUNNER_TEMP/luna-results/check"
+          node "$RUNNER_TEMP/alpha-lint/node_modules/oxlint/bin/oxlint" -c alpha/oxlint.json --no-ignore alpha --threads 1 | tee .artifacts/luna-repair/lint.log
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: luna-configuration-and-gateway-results
+          name: luna-offline-results
+          path: .artifacts/luna-repair/
+          retention-days: 14
+  provider:
+    needs: offline
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Build the pinned Node 24 development image
+        run: docker build -f .devcontainer/Dockerfile -t dsh930-luna-dev .
+      - name: Frozen install, native build, full build and lint
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp/dsh930-home -e CI=true \
+            -v "$PWD:/workspaces/dsh930" -w /workspaces/dsh930 dsh930-luna-dev bash .devcontainer/setup.sh
+      - name: Full provider regression plus native DSH wire test (no real model)
+        run: |
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp/dsh930-home -e CI=true \
+            -v "$PWD:/workspaces/dsh930" -w /workspaces/dsh930 dsh930-luna-dev bash -euc '
+              mkdir -p "$HOME"
+              node alpha/provider-regression.mjs .artifacts/luna-provider
+              node alpha/luna-native-smoke.mjs .artifacts/luna-native --fixture
+              node alpha/tests/native-smoke.mjs
+            '
+          git diff --exit-code
+      - name: Explicit live test or safe credential/budget readiness report
+        env:
+          ALPHA_SMOKE_API_KEY: ${{ secrets.ALPHA_SMOKE_API_KEY }}
+          ALPHA_SMOKE_ALLOW_LIVE: ${{ inputs.run_live && '1' || '0' }}
+          ALPHA_SMOKE_MAX_USD: ${{ inputs.max_usd || '0.25' }}
+          ALPHA_SMOKE_INPUT_USD_PER_MILLION: ${{ inputs.input_usd_per_million }}
+          ALPHA_SMOKE_OUTPUT_USD_PER_MILLION: ${{ inputs.output_usd_per_million }}
+        run: |
+          set +e
+          docker run --rm --user "$(id -u):$(id -g)" -e HOME=/tmp/dsh930-home -e CI=true \
+            -e ALPHA_SMOKE_API_KEY -e ALPHA_SMOKE_ALLOW_LIVE -e ALPHA_SMOKE_MAX_USD \
+            -e ALPHA_SMOKE_INPUT_USD_PER_MILLION -e ALPHA_SMOKE_OUTPUT_USD_PER_MILLION \
+            -v "$PWD:/workspaces/dsh930" -w /workspaces/dsh930 dsh930-luna-dev \
+            node alpha/luna-controlled.mjs .artifacts/luna-live
+          status=$?
+          if [ "$ALPHA_SMOKE_ALLOW_LIVE" = 1 ]; then exit "$status"; fi
+          # A readiness-only run never claims live success; its report retains the blocker.
+          test "$status" -eq 2
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: luna-provider-native-and-readiness
           path: |
-            ${{ runner.temp }}/luna-results/tests.log
-            ${{ runner.temp }}/luna-results/lint.log
-            ${{ runner.temp }}/luna-results/node.txt
-            ${{ runner.temp }}/luna-results/source-commit.txt
-            ${{ runner.temp }}/luna-results/check/report.json
-          retention-days: 7
+            .artifacts/dsh930-development/
+            .artifacts/luna-provider/
+            .artifacts/luna-native/native-report.json
+            .artifacts/luna-live/controlled-report.json
+            .artifacts/luna-live/native-report.json
+          retention-days: 14
