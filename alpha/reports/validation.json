@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "release": "dsh-alpha-0.1.0",
+  "recordedAt": "2026-10-06T03:07:13.890365+00:00",
+  "baseCommit": "7a83cb480fb61a98483cb8c79a37388295a45237",
+  "node": "v24.21.0",
+  "logicalActors": 14,
+  "skillCount": 10,
+  "tests": {
+    "passed": 67,
+    "failed": 0,
+    "skipped": 0,
+    "command": "node --test alpha/tests/*.test.mjs"
+  },
+  "lint": {
+    "command": "node node_modules/oxlint/bin/oxlint -c alpha/oxlint.json --no-ignore alpha --threads 1",
+    "files": 12,
+    "errors": 0,
+    "warnings": 0,
+    "typeAware": false
+  },
+  "nativeDshIntegration": {
+    "status": "passed",
+    "pairs": 7,
+    "subagentCalls": 21,
+    "modelAndWebBackend": "deterministic-fixture",
+    "paidModelCalls": 0,
+    "realModelQualityEvaluated": false
+  },
+  "unconfiguredLivePreflight": {
+    "exitCode": 2,
+    "ready": false
+  },
+  "deliveryStatus": "implementation-tested-models-unbound",
+  "claimsNotMade": [
+    "fourteen-live-model-agents",
+    "business-quality-accepted",
+    "autonomous-tool-installation",
+    "generated-team-business-execution",
+    "resume-after-restart",
+    "hard-dollar-budget",
+    "pi-comparison-winner"
+  ],
+  "logSha256": {
+    "unit-tests.log": "e626490bceeebda0d07fa6cef44aa2268e7bf19b24cd3eba8469f783b147f757",
+    "lint.log": "48e4bbe4de5ab4678c5f525510fe42642c63d273da1b8c17c2c50871f268e719",
+    "native-fixture.json": "18961b69571dde0da0ea349ed3392f042e3fe25361664a712607eae46f482dca",
+    "unbound-preflight.json": "cfdd8f3767f2f0a7e31973cbd9e780a96fe6190b82b7e865960048e567dfa837"
+  },
+  "sourceSha256": {
+    ".dsh/skills/alpha-architect/SKILL.md": "328fbd228b3d4770ab96a6dae6f3baa9f5be095c95dca3b7363424b1ea8939d1",
+    ".dsh/skills/alpha-evaluator/SKILL.md": "fc85458eb52d8c653b1bd996e4184bb1d84ad170866234bb93dc75e3416bce37",
+    ".dsh/skills/alpha-evidence/SKILL.md": "068ca3972389ab048b01fb93d955563790c308fa4985ccada4c2cd58f0fe31e7",
+    ".dsh/skills/alpha-integrator/SKILL.md": "2a394f13fb331f3ea5a9e19da5b758dd1777033b57992143e96bd6c073d8f592",
+    ".dsh/skills/alpha-lead/SKILL.md": "2a989efff63e1c03b7dd19a655278a8734578d9347cdd30f09eeda77549753b0",
+    ".dsh/skills/alpha-model-lab/SKILL.md": "ea64faace56a984eb4c4f30ff2b13b13b31e0199f22cc8417b3c0c433face87d",
+    ".dsh/skills/alpha-parallel-review/SKILL.md": "c2d5ff27d1e0e8c7a3b17a266e7f5088d46694a0c01e60b5de2a0abba8d76337",
+    ".dsh/skills/alpha-rd/SKILL.md": "55b89286cf13c68e3c168f2946f1dc203b7031edf87433892fe5594ce2725a0e",
+    ".dsh/skills/alpha-research/SKILL.md": "2168002ef98391d26d55bd0190d62ded22900c6caa775b3bb36c7e1d93b1f80a",
+    ".dsh/skills/alpha-skill-lab/SKILL.md": "318721aac68a348fbb9f5b58908239577ea0431a142530d7c7927deb39adf71d",
+    "alpha/.gitignore": "e4ab348aa20b84a8fdd924dd4348bbf52aece859054f43332bfaaae2e73628e3",
+    "alpha/BINDING_GUIDE.zh.md": "369bd52191a46edd315209305fae664b7795851522898a2ed44075fc8d99bbf5",
+    "alpha/README.zh.md": "e888eb35142d57eeb549077027d976f143b023783ca686449b3611b0dfbaf537",
+    "alpha/RESEARCH.zh.md": "c66b97ab67060d77119f88c82935500c4b8559ea4c6622f9b4cb15fa462e65e8",
+    "alpha/SELF-REVIEW.zh.md": "d20c68e5f97668a41be41485b2e6bf8dfe7cff62c5f23f11c6c470dff7553cdd",
+    "alpha/cli.mjs": "dd35d9ac9db02982372147014206161fbe69af48949f19f9fd1e6183345af988",
+    "alpha/cordis.patch.yml": "d5718b0f1ed5d9e2e82ef522080c2ab3603d18313adccc1f48f6f8b05995a80a",
+    "alpha/core.mjs": "e55767c5c42e7f443dc0c7d08b3bfa573645c53f286f97b6b262b9bc783da5e0",
+    "alpha/dsh-adapter.mjs": "7bb4f903037233ee29714916c15c67a97f59aeaee5ef9e9c3f9eff292b8c4a6f",
+    "alpha/dsh-plugin.mjs": "ed58ac1fd38484d91b9fd31b5c7e480fac3c8a7a8665a4d252969a6ba6aff846",
+    "alpha/evals/tasks.json": "c4e8a797aa08d6ed4c2821330f3bc389735cbcfa8e63512e00cd87a06b1bbf4e",
+    "alpha/fixtures.mjs": "4d71d30b7929f9a62d6b0ca1bc8eaae88ba3e5ba42af7c760a3e8ebe8b3b5e62",
+    "alpha/models.example.json": "be1262f17f8f840a4810929e26e385ba4fa8190195fd6d012ee3c0d81ea84ae4",
+    "alpha/oxlint.json": "20abf985276cbcc367f99a9904493d741bbf895803a4c9fa31d1df7e6c8ce9d2",
+    "alpha/runner.mjs": "5a96639739e69498a3127c4611b77b2eff0a5bf05245c216259850618bb9b197",
+    "alpha/skills.lock.json": "39e99130e294e8124cff75ea7983ae09a5b6358504efc4dc0fad2e0e918d718d",
+    "alpha/team.json": "5ee621581e2be5e0894fe507d4c7029de2dbd8f9ea435a584d0db7138ecab686",
+    "alpha/tests/adapter.test.mjs": "de7e7bcdf3e3cb04a2c91c31a488aae483e99fb929b573f07c04b5bab8be634c",
+    "alpha/tests/assets.test.mjs": "1584da79e454b843084252cda5108e3caa4b51d5c20f04c96b827d0614b08069",
+    "alpha/tests/core.test.mjs": "f35805a3c3e3ffcfdeda1e7b12281f3819cb42eddb1d4a10b7681228d9536dca",
+    "alpha/tests/native-fixture.mjs": "e1137a3231a140d9069d4e82a041a93dcaec0c69e206b69de69c6863147b91a7",
+    "alpha/tests/native-smoke.mjs": "42eaa969995c3aa96367212a0f1938137556a801ac010e86fddabe7092dd638b",
+    "alpha/tests/runner.test.mjs": "c89660776e709f203acbc377434a280ccc1122d3a8beebe9fceb6b9100e5801a"
+  }
+}

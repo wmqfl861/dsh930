@@ -1,0 +1,8 @@
+# Copy/generate an absolute-path overlay using `node alpha/cli.mjs overlay <new-file>`.
+# Loading alone performs no live calls; DSH_ALPHA_CONFIG points to a private route-reference file.
+- insert:
+    - id: dsh-alpha-team
+      name: './dsh-plugin.mjs'
+      config:
+        modelConfigPath: !!js process.env.DSH_ALPHA_CONFIG
+        stateDirectory: !!js process.env.DSH_ALPHA_STATE_DIR

@@ -1,0 +1,146 @@
+{
+  "schemaVersion": 1,
+  "id": "dsh-alpha",
+  "version": "0.1.0",
+  "purpose": "研究、建设、组建并验证其他Agent团队；不是固定行业团队。",
+  "baseCommit": "7a83cb480fb61a98483cb8c79a37388295a45237",
+  "logicalActors": 14,
+  "sharedSkills": [
+    "alpha-evidence",
+    "alpha-parallel-review",
+    "alpha-rd"
+  ],
+  "limits": {
+    "maxConcurrentPairs": 1,
+    "maxDelegations": 35,
+    "maxRepairRounds": 1,
+    "pairTimeoutMs": 600000,
+    "maxResultBytes": 262144
+  },
+  "roles": [
+    {
+      "id": "lead",
+      "title": "沟通与调度",
+      "dependsOn": [],
+      "primary": "lead",
+      "shadow": "lead-shadow",
+      "skill": "alpha-lead",
+      "mission": "澄清目标、硬条件和假设；负责派工、优先级与用户决策，不承担最终成果整合。",
+      "reviewFocus": "误读用户、擅改范围、把假设说成要求、调度资源失衡。",
+      "deliverable": "任务简报、成功标准、需求变更与调度建议",
+      "tools": [],
+      "capabilityNotes": "首版默认只读网络与内联结构化产物；文件写入、执行任意代码、安装与发布须另接有隔离和预算控制的工具，未接通不得声称实测。"
+    },
+    {
+      "id": "research",
+      "title": "领域研究",
+      "dependsOn": [
+        "lead"
+      ],
+      "primary": "research",
+      "shadow": "research-shadow",
+      "skill": "alpha-research",
+      "mission": "追溯一手资料，比较专业路线，调查局限与反例；无现成路线时提出可验证的新方法。",
+      "reviewFocus": "过时资料、引文不支持结论、遗漏反例、SEO热度替代证据、浅搜即停。",
+      "deliverable": "证据表、路线对比、能力缺口与待验证假设",
+      "tools": [
+        "web_search",
+        "web_fetch"
+      ],
+      "capabilityNotes": "首版默认只读网络与内联结构化产物；文件写入、执行任意代码、安装与发布须另接有隔离和预算控制的工具，未接通不得声称实测。"
+    },
+    {
+      "id": "model-lab",
+      "title": "模型选型与实验",
+      "dependsOn": [
+        "lead"
+      ],
+      "primary": "model-lab",
+      "shadow": "model-lab-shadow",
+      "skill": "alpha-model-lab",
+      "mission": "盘点真实模型配置和接口能力，设计同题同预算试岗与主影配对实验；绝不凭品牌名宣布强弱。",
+      "reviewFocus": "模型别名伪装多样性、输入不公平、只挑一次成功、结果泄漏、未计返工成本。",
+      "deliverable": "模型能力档案、实测或待测矩阵、岗位与主影绑定建议",
+      "tools": [
+        "web_search",
+        "web_fetch"
+      ],
+      "capabilityNotes": "首版默认只读网络与内联结构化产物；文件写入、执行任意代码、安装与发布须另接有隔离和预算控制的工具，未接通不得声称实测。"
+    },
+    {
+      "id": "architect",
+      "title": "团队与流程架构",
+      "dependsOn": [
+        "research",
+        "model-lab"
+      ],
+      "primary": "architect",
+      "shadow": "architect-shadow",
+      "skill": "alpha-architect",
+      "mission": "由能力需求推导最小团队；划分人工、模型和确定性工具工作；定义DAG、交接、失败处理和恢复语义。",
+      "reviewFocus": "岗位冗余、循环依赖、无人负责的交付、恢复后重复付费、工具或模型能力不存在。",
+      "deliverable": "团队候选清单、成员输入输出、带失败与审批节点的流程",
+      "tools": [
+        "web_search",
+        "web_fetch"
+      ],
+      "capabilityNotes": "首版默认只读网络与内联结构化产物；文件写入、执行任意代码、安装与发布须另接有隔离和预算控制的工具，未接通不得声称实测。"
+    },
+    {
+      "id": "skill-lab",
+      "title": "Skill与工具工程",
+      "dependsOn": [
+        "architect"
+      ],
+      "primary": "skill-lab",
+      "shadow": "skill-lab-shadow",
+      "skill": "alpha-skill-lab",
+      "mission": "优先复用已许可且适用的成熟能力；隔离评审、适配并测试；不足时提出假设、最小原型与迭代实验。",
+      "reviewFocus": "提示词冒充工具、脚本权限过大、依赖失效、只对示例有效、没有基线或独立测试。",
+      "deliverable": "候选Skill源码、工具接入需求、测试记录、版本与许可信息",
+      "tools": [
+        "web_search",
+        "web_fetch"
+      ],
+      "capabilityNotes": "首版默认只读网络与内联结构化产物；文件写入、执行任意代码、安装与发布须另接有隔离和预算控制的工具，未接通不得声称实测。"
+    },
+    {
+      "id": "integrator",
+      "title": "成果整合",
+      "dependsOn": [
+        "architect",
+        "skill-lab",
+        "model-lab"
+      ],
+      "primary": "integrator",
+      "shadow": "integrator-shadow",
+      "skill": "alpha-integrator",
+      "mission": "只整合受审查的明确版本；核对模型、技能、工具与流程相互匹配；保留来源、分歧和限制；向主控提补单。",
+      "reviewFocus": "错版、漏项、把可能可用升级成已验证、隐藏阻塞、私自更换用户要求。",
+      "deliverable": "可校验团队包、依赖锁定、运行说明与缺口清单",
+      "tools": [
+        "web_search",
+        "web_fetch"
+      ],
+      "capabilityNotes": "首版默认只读网络与内联结构化产物；文件写入、执行任意代码、安装与发布须另接有隔离和预算控制的工具，未接通不得声称实测。"
+    },
+    {
+      "id": "evaluator",
+      "title": "独立评测与验收",
+      "dependsOn": [
+        "integrator"
+      ],
+      "primary": "evaluator",
+      "shadow": "evaluator-shadow",
+      "skill": "alpha-evaluator",
+      "mission": "依据预先冻结要求检查实际产物和执行证据；用新案例与简单基线对照，测试错误/中断/恢复路径。",
+      "reviewFocus": "测错目标、评分偏差、无缺陷样本误报、跳过算通过、模型自报代替真实试验。",
+      "deliverable": "可复现试跑、通过范围、失败证据、需用户批准的候选团队",
+      "tools": [
+        "web_search",
+        "web_fetch"
+      ],
+      "capabilityNotes": "首版默认只读网络与内联结构化产物；文件写入、执行任意代码、安装与发布须另接有隔离和预算控制的工具，未接通不得声称实测。"
+    }
+  ]
+}

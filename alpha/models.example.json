@@ -1,0 +1,8 @@
+{
+  "schemaVersion": 1,
+  "liveEnabled": false,
+  "subagentProvider": "spawn",
+  "models": [],
+  "bindings": {},
+  "note": "复制为仓库外私有配置后填写真实DSH已配置路由。models每项含 id/provider/model/canonicalModelId/family/maxTokens，bindings每岗位含primary/shadow模型配置id。不同路由别名不能冒充不同模型。不在此文件填写密钥。liveEnabled默认false，不产生模型调用。"
+}

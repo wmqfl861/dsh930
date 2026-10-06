@@ -1,0 +1,13 @@
+{
+  "ready": false,
+  "issues": [
+    "LIVE_DISABLED",
+    "UNBOUND_PAIR:lead",
+    "UNBOUND_PAIR:research",
+    "UNBOUND_PAIR:model-lab",
+    "UNBOUND_PAIR:architect",
+    "UNBOUND_PAIR:skill-lab",
+    "UNBOUND_PAIR:integrator",
+    "UNBOUND_PAIR:evaluator"
+  ]
+}

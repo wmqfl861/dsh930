@@ -1,0 +1,8 @@
+{
+  "$schema": "../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["oxc", "unicorn"],
+  "categories": { "correctness": "error" },
+  "env": { "builtin": true, "node": true },
+  "ignorePatterns": [],
+  "rules": { "no-unused-vars": ["error", { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_", "caughtErrorsIgnorePattern": "^_" }] }
+}
