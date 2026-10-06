@@ -1,10 +1,15 @@
 /** One explicit live run: at most 3 direct + 2 native requests under one reservation budget. */
 import {mkdir,readFile,writeFile} from 'node:fs/promises';
-import {resolve,join} from 'node:path';
+import {resolve,join,dirname} from 'node:path';
 import {configureLuna,probeLuna} from './luna-smoke.mjs';
 import {liveBudgetFromEnv} from './luna-budget.mjs';
 const folder=resolve(process.argv[2]??'.artifacts/luna-controlled');
-await mkdir(folder,{recursive:true,mode:0o700});
+await mkdir(dirname(folder),{recursive:true,mode:0o700});
+try { await mkdir(folder,{mode:0o700}); }
+catch(error) {
+  console.error(JSON.stringify({status:'blocked',reason:error.code==='EEXIST'?'OUTPUT_DIRECTORY_EXISTS':'OUTPUT_DIRECTORY_UNAVAILABLE',inferenceRequests:0}));
+  process.exit(2);
+}
 const report={schemaVersion:1,status:'not_started',maxInferenceRequests:5,inferenceRequests:0,successfulInferenceRequests:0,
   teamRun:false,qualityAcceptanceGranted:false,prior404Cause:'unproven; previous response body/content-type were not recorded'};
 try {
@@ -34,5 +39,5 @@ try {
   }
   report.budget=budget.report();
 }catch(error){report.status='blocked';report.reason=/^[A-Z_]+$/.test(error.message)?error.message:'CONTROLLED_TEST_ERROR';}
-await writeFile(join(folder,'controlled-report.json'),JSON.stringify(report,null,2)+'\n',{mode:0o600});
+await writeFile(join(folder,'controlled-report.json'),JSON.stringify(report,null,2)+'\n',{mode:0o600,flag:'wx'});
 console.log(JSON.stringify(report,null,2));process.exitCode=report.status==='bounded_smoke_passed'?0:2;
