@@ -40,9 +40,17 @@ export class RunStore {
 
 /** Each run captures immutable team, skill, model, brief and policy versions. */
 export class AlphaRunner {
-  constructor({team,skills,revision,config,executor,store}) {
+  constructor({team,skills,revision,config,executor,store,executionScope='team'}) {
+    requireThat(['team','research-pair'].includes(executionScope),'EXECUTION_SCOPE','Unknown Alpha execution scope');
     this.team=copy(team); this.skills=copy(skills); this.revision=revision; this.config=copy(config);
     this.executor=executor; this.store=store; this.busy=false;
+    this.executionScope=executionScope;
+    if (executionScope === 'research-pair') {
+      const research=this.team.roles.find(role=>role.id==='research');
+      requireThat(research,'RESEARCH_ROLE','Research scope requires the research pair');
+      this.team.roles=[{...research,dependsOn:[]}];
+      this.team.logicalActors=2;
+    }
     if (this.config.executionPurpose === 'single-model-smoke') {
       this.team.limits.maxConcurrentPairs = 1;
       this.team.limits.maxDelegations = Math.min(this.team.limits.maxDelegations, 21);
@@ -59,12 +67,13 @@ export class AlphaRunner {
     const ctl=new AbortController();
     const runSignal=signal ? AbortSignal.any([signal,ctl.signal]) : ctl.signal;
     this.state={schemaVersion:1,id:randomUUID(),mode:this.executor.mode,status:'preflight',executionPurpose:p.executionPurpose,independentReviewConfigured:p.independentReviewConfigured,qualityAcceptanceGranted:false,brief:copy(brief),briefHash:digest(brief),teamRevision:this.revision,configHash:digest(this.config),delegationsReserved:0,events:[],pairs:{},createdAt:new Date().toISOString()};
+    if(this.executionScope==='research-pair')this.state.executionScope=this.executionScope;
     let created=false;
     try {
       runSignal.throwIfAborted();
       await this.executor.preflight?.(this.team,this.config,runSignal);
       await this.store.create(this.state); created=true;
-      await this.record('run-start',{logicalActors:14}); this.state.status='running';
+      await this.record('run-start',{logicalActors:this.team.roles.length*2,...(this.executionScope==='research-pair'?{executionScope:this.executionScope}:{})}); this.state.status='running';
       const pending=new Set(this.team.roles.map(r=>r.id));
       while(pending.size) {
         runSignal.throwIfAborted();
@@ -73,6 +82,11 @@ export class AlphaRunner {
         const settled=await Promise.allSettled(ready.map(role=>this.pair(role,runSignal).catch(error=>{ctl.abort(error);throw error;})));
         const failed=settled.find(r=>r.status==='rejected'); if(failed) throw failed.reason;
         for(const role of ready) pending.delete(role.id);
+      }
+      if(this.executionScope==='research-pair') {
+        this.state.status=this.executor.mode==='fixture'?'fixture_complete':'research_reviewed';
+        await this.record('run-end',{status:this.state.status});
+        return copy(this.state);
       }
       const candidate=this.state.pairs.integrator.draft.artifact;
       validateCandidate(candidate);

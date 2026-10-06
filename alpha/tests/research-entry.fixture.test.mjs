@@ -1,32 +1,99 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { runResearchPair } from '../research-entry.mjs';
-
-function fixtureExecutor(mode = 'ok') {
-  return {
-    mode: 'dsh',
-    async preflight() {},
-    async execute({ phase }) {
-      if (mode === 'fail' && phase === 'draft') throw new Error('fixture failure');
-      if (mode === 'cancel' && phase === 'prepare') return await new Promise(() => {});
-      if (phase === 'prepare') return { sources: [], coverage: ['research scope'], checks: ['source check'], uncertainties: [] };
-      if (phase === 'draft') return { sources: [], summary: 'fixture research', artifact: { candidate: true }, alternatives: ['fixture'], openQuestions: [], experiments: [] };
-      return { sources: [], subjectHash: arguments[0]?.subjectHash ?? '', verdict: 'pass', findings: [], checked: ['fixture review'] };
-    }
-  };
+import {mkdtemp,readFile,readdir,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
+import {runResearchPair} from '../research-entry.mjs';
+import {loadTeam,digest,copy} from '../core.mjs';
+import {AlphaRunner,RunStore} from '../runner.mjs';
+import {fixtureConfig,fixtureExecutor,fixtureResponse} from '../fixtures.mjs';
+const loaded=await loadTeam();
+const brief={goal:'Research one bounded topic',acceptance:['Review the exact draft']};
+async function setup(t,executor=fixtureExecutor()) {
+ const directory=await mkdtemp(join(tmpdir(),'alpha-research-entry-'));
+ t.after(()=>rm(directory,{recursive:true,force:true}));
+ const store=new RunStore(directory);
+ return {args:{...loaded,config:fixtureConfig(loaded.team),executor,store,brief},store,directory};
 }
+async function persisted(store){return JSON.parse(await readFile(store.file,'utf8'));}
+async function noLock(directory){assert.equal((await readdir(directory)).some(name=>name.endsWith('.lock')),false);}
 
-test('research pair fixture succeeds without live model calls', async () => {
-  const result = await runResearchPair({ executor: fixtureExecutor(), brief: { goal: 'research', acceptance: ['reviewed'] } });
-  assert.equal(result.status, 'reviewed');
+test('research entry completes exactly one reviewed fixture pair and preserves its inputs',async t=>{
+ const calls=[];let releaseMain;const mainStarted=new Promise(resolve=>releaseMain=resolve);
+ const executor=fixtureExecutor(async call=>{
+  calls.push(call);
+  if(call.phase==='prepare'){assert.equal(Object.hasOwn(call.input,'draft'),false);await mainStarted;}
+  if(call.phase==='draft')releaseMain();
+  if(call.phase==='review'){assert.equal(call.input.subjectHash,digest(call.input.draft));assert.ok(call.input.preparation.checks.length);}
+ });
+ const {args,store,directory}=await setup(t,executor);const original=copy(args.team),config=copy(args.config);
+ const result=await runResearchPair(args);
+ assert.equal(result.status,'fixture_complete');assert.equal(result.executionScope,'research-pair');
+ assert.equal(result.qualityAcceptanceGranted,false);assert.deepEqual(Object.keys(result.pairs),['research']);
+ assert.equal(result.pairs.research.status,'reviewed');assert.equal(result.delegationsReserved,3);
+ assert.equal(Object.hasOwn(result,'candidateHash'),false);
+ assert.deepEqual(calls.map(c=>[c.actor,c.phase]),[['research-shadow','prepare'],['research','draft'],['research-shadow','review']]);
+ assert.ok(calls.every(c=>c.role.id==='research'&&Object.keys(c.input.upstream).length===0));
+ assert.equal(result.events.find(e=>e.type==='run-start').logicalActors,2);
+ assert.equal(result.events.at(-1).type,'run-end');assert.deepEqual(await persisted(store),result);
+ assert.deepEqual(args.team,original);assert.deepEqual(args.config,config);await noLock(directory);
 });
 
-test('research pair fixture cancellation does not accept', async () => {
-  const controller = new AbortController();
-  controller.abort();
-  await assert.rejects(() => runResearchPair({ executor: fixtureExecutor('cancel'), signal: controller.signal, brief: { goal: 'research', acceptance: ['reviewed'] } }));
+test('research DSH-mode executor returns review completion without team or quality acceptance',async t=>{
+ const executor=fixtureExecutor();executor.mode='dsh';
+ let checked=false;executor.preflight=async team=>{checked=true;assert.deepEqual(team.roles.map(r=>r.id),['research']);};
+ const {args}=await setup(t,executor);const result=await runResearchPair(args);
+ assert.equal(checked,true);assert.equal(result.status,'research_reviewed');assert.equal(result.qualityAcceptanceGranted,false);
+ assert.equal(Object.hasOwn(result,'candidateHash'),false);
 });
 
-test('research pair fixture failure blocks acceptance', async () => {
-  await assert.rejects(() => runResearchPair({ executor: fixtureExecutor('fail'), brief: { goal: 'research', acceptance: ['reviewed'] } }));
+test('research entry preserves live-disabled rejection before creating a run or invoking executor',async t=>{
+ let calls=0;const {args,store,directory}=await setup(t,fixtureExecutor(()=>calls++));args.config.liveEnabled=false;
+ await assert.rejects(runResearchPair(args),{code:'PREFLIGHT',message:'LIVE_DISABLED'});
+ assert.equal(calls,0);assert.equal(store.file,undefined);assert.deepEqual(await readdir(directory),[]);
+});
+
+test('already cancelled research entry invokes no executor and creates no run',async t=>{
+ let calls=0;const {args,store}=await setup(t,fixtureExecutor(()=>calls++));
+ const controller=new AbortController();const reason=new Error('caller cancelled before start');controller.abort(reason);
+ await assert.rejects(runResearchPair({...args,signal:controller.signal}),error=>error===reason);
+ assert.equal(calls,0);assert.equal(store.file,undefined);
+});
+
+test('research cancellation interrupts both active delegates and closes the journal',async t=>{
+ const controller=new AbortController();const reason=new Error('caller cancelled active research');let started=0,stopped=0;
+ const executor=fixtureExecutor(async call=>{
+  if(++started===2)queueMicrotask(()=>controller.abort(reason));
+  await new Promise((resolve,reject)=>{call.signal.addEventListener('abort',()=>{stopped++;reject(call.signal.reason);},{once:true});});
+ });
+ const {args,store,directory}=await setup(t,executor);
+ await assert.rejects(runResearchPair({...args,signal:controller.signal}),error=>error===reason);
+ assert.equal(started,2);assert.equal(stopped,2);const state=await persisted(store);
+ assert.equal(state.status,'cancelled');assert.equal(state.executionScope,'research-pair');await noLock(directory);
+});
+
+test('research shadow failure cancels its sibling and never reaches review or acceptance',async t=>{
+ const failure=new Error('fixture shadow failed');let mainStarted,stopped=false,reviews=0;
+ const gate=new Promise(resolve=>mainStarted=resolve);
+ const executor=fixtureExecutor(async call=>{
+  if(call.phase==='prepare'){await gate;throw failure;}
+  if(call.phase==='review'){reviews++;return;}
+  mainStarted();await new Promise((resolve,reject)=>{call.signal.addEventListener('abort',()=>{stopped=true;reject(call.signal.reason);},{once:true});});
+ });
+ const {args,store,directory}=await setup(t,executor);
+ await assert.rejects(runResearchPair(args),error=>error===failure);
+ const state=await persisted(store);assert.equal(stopped,true);assert.equal(reviews,0);assert.equal(state.status,'blocked');
+ assert.equal(state.qualityAcceptanceGranted,false);await noLock(directory);
+});
+
+test('research review remains bound to the submitted draft hash',async t=>{
+ const executor=fixtureExecutor();executor.execute=async call=>{const output=fixtureResponse(call);if(call.phase==='review')output.subjectHash='wrong-version';return output;};
+ const {args,store,directory}=await setup(t,executor);
+ await assert.rejects(runResearchPair(args),{code:'STALE_REVIEW'});assert.equal((await persisted(store)).status,'blocked');await noLock(directory);
+});
+
+test('research scope rejects a missing research role and unknown scopes',()=>{
+ const args={...loaded,config:fixtureConfig(loaded.team),executor:fixtureExecutor(),store:{}};
+ assert.throws(()=>new AlphaRunner({...args,executionScope:'unknown'}),{code:'EXECUTION_SCOPE'});
+ assert.throws(()=>new AlphaRunner({...args,team:{...loaded.team,roles:[]},executionScope:'research-pair'}),{code:'RESEARCH_ROLE'});
 });
