@@ -21,7 +21,9 @@
       "prompt": "TEST ONLY: Wide shot of a paper boat on a painted pond.",
       "assetRefs": [],
       "durationSeconds": null,
-      "aspectRatio": null
+      "aspectRatio": null,
+      "resolution": null,
+      "inputMode": null
     },
     {
       "id": "shot-02",
@@ -31,7 +33,9 @@
       "prompt": "TEST ONLY: A fictional character notices the paper boat.",
       "assetRefs": [{ "id": "fictional-character-sheet", "revision": 1 }],
       "durationSeconds": null,
-      "aspectRatio": null
+      "aspectRatio": null,
+      "resolution": null,
+      "inputMode": null
     },
     {
       "id": "shot-03",
@@ -41,7 +45,9 @@
       "prompt": "TEST ONLY: Close shot of the paper boat reaching a painted shore.",
       "assetRefs": [],
       "durationSeconds": null,
-      "aspectRatio": null
+      "aspectRatio": null,
+      "resolution": null,
+      "inputMode": null
     }
   ]
 }
