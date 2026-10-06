@@ -72,8 +72,12 @@ export function validateTeam(team) {
 /** Route declarations contain references only; no keys, tokens or arbitrary endpoint URLs. */
 export function preflight(team, config) {
   const issues = [];
+  const executionPurpose = config.executionPurpose ?? 'team-building';
+  const smoke = executionPurpose === 'single-model-smoke';
+  if (!['team-building', 'single-model-smoke'].includes(executionPurpose)) issues.push('EXECUTION_PURPOSE_INVALID');
+  if (smoke && config.acknowledgeNoIndependentReview !== true) issues.push('SMOKE_ACK_REQUIRED');
   if (config.schemaVersion !== 1) issues.push('CONFIG_VERSION');
-  if (!config.liveEnabled) issues.push('LIVE_DISABLED');
+  if (config.liveEnabled !== true) issues.push('LIVE_DISABLED');
   if (config.subagentProvider !== 'spawn') issues.push('FRESH_SPAWN_REQUIRED');
   if (!Array.isArray(config.models) || !object(config.bindings)) return { ready: false, issues: [...issues, 'MODEL_CONFIG_MISSING'] };
   const models = new Map();
@@ -86,15 +90,16 @@ export function preflight(team, config) {
     if (models.has(m.id)) issues.push('DUPLICATE_MODEL_REF');
     models.set(m.id, m);
   }
+  if (smoke && models.size !== 1) issues.push('SMOKE_SINGLE_ROUTE_REQUIRED');
   for (const role of team.roles) {
     const b = config.bindings[role.id];
     const main = models.get(b?.primary), shadow = models.get(b?.shadow);
     if (!main || !shadow) { issues.push(`UNBOUND_PAIR:${role.id}`); continue; }
-    if (main.canonicalModelId === shadow.canonicalModelId || (main.model === shadow.model && main.provider === shadow.provider)) {
+    if (!smoke && (main.canonicalModelId === shadow.canonicalModelId || (main.model === shadow.model && main.provider === shadow.provider))) {
       issues.push(`SAME_MODEL_PAIR:${role.id}`);
     }
   }
-  return { ready: issues.length === 0, issues };
+  return { ready: issues.length === 0, issues, executionPurpose, independentReviewConfigured: !smoke, warnings: smoke ? ['SINGLE_MODEL_SMOKE_NOT_QUALITY_ACCEPTANCE'] : [] };
 }
 
 /** Build a typed task description. Goal text is data, never evaluated as instructions by the host. */

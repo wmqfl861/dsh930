@@ -43,6 +43,11 @@ export class AlphaRunner {
   constructor({team,skills,revision,config,executor,store}) {
     this.team=copy(team); this.skills=copy(skills); this.revision=revision; this.config=copy(config);
     this.executor=executor; this.store=store; this.busy=false;
+    if (this.config.executionPurpose === 'single-model-smoke') {
+      this.team.limits.maxConcurrentPairs = 1;
+      this.team.limits.maxDelegations = Math.min(this.team.limits.maxDelegations, 21);
+      this.team.limits.maxRepairRounds = 0;
+    }
   }
   async run(brief, signal) {
     requireThat(!this.busy,'RUN_BUSY','One runner instance owns one run at a time');
@@ -53,7 +58,7 @@ export class AlphaRunner {
     this.busy=true;
     const ctl=new AbortController();
     const runSignal=signal ? AbortSignal.any([signal,ctl.signal]) : ctl.signal;
-    this.state={schemaVersion:1,id:randomUUID(),mode:this.executor.mode,status:'preflight',brief:copy(brief),briefHash:digest(brief),teamRevision:this.revision,configHash:digest(this.config),delegationsReserved:0,events:[],pairs:{},createdAt:new Date().toISOString()};
+    this.state={schemaVersion:1,id:randomUUID(),mode:this.executor.mode,status:'preflight',executionPurpose:p.executionPurpose,independentReviewConfigured:p.independentReviewConfigured,qualityAcceptanceGranted:false,brief:copy(brief),briefHash:digest(brief),teamRevision:this.revision,configHash:digest(this.config),delegationsReserved:0,events:[],pairs:{},createdAt:new Date().toISOString()};
     let created=false;
     try {
       runSignal.throwIfAborted();
@@ -76,7 +81,7 @@ export class AlphaRunner {
       requireThat(candidate.gaps.length===0,'CANDIDATE_GAPS','Integration still has unresolved capability gaps');
       requireThat(this.state.pairs.evaluator.draft.artifact?.acceptedCandidateHash === digest(candidate),'ACCEPTANCE_SUBJECT','Evaluator did not examine the exact integrated team version');
       this.state.candidateHash=digest(candidate);
-      this.state.status=this.executor.mode==='fixture'?'fixture_complete':'awaiting_human_acceptance';
+      this.state.status=this.executor.mode==='fixture'?'fixture_complete':this.config.executionPurpose==='single-model-smoke'?'smoke_complete':'awaiting_human_acceptance';
       await this.record('run-end',{status:this.state.status});
       return copy(this.state);
     } catch(error) {
@@ -118,6 +123,7 @@ export class AlphaRunner {
     const input={brief:copy(this.state.brief),briefHash:this.state.briefHash,upstream};
     if(role.id==='evaluator') input.candidateHash=digest(upstream.integrator.artifact);
     input.allowedModelRefs=this.config.models.map(m=>m.id);
+    if (this.config.executionPurpose === 'single-model-smoke') input.testScope='Single-model connectivity smoke only, not independent review or quality acceptance. Preserve evidence checks and real blockers.';
     this.state.pairs[role.id]={status:'researching',main:role.primary,shadow:role.shadow};
     await this.record('pair-start',{role:role.id});
     const run=(phase)=>this.invoke(role,phase,input,scoped).catch(error=>{ctl.abort(error);throw error;});
