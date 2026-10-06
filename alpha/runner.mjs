@@ -51,15 +51,16 @@ export class AlphaRunner {
       this.team.roles=[{...research,dependsOn:[]}];
       this.team.logicalActors=2;
     }
-    if (this.config.executionPurpose === 'single-model-smoke') {
+    if (['single-model-smoke','single-model-research'].includes(this.config.executionPurpose)) {
       this.team.limits.maxConcurrentPairs = 1;
-      this.team.limits.maxDelegations = Math.min(this.team.limits.maxDelegations, 21);
+      this.team.limits.maxDelegations = Math.min(this.team.limits.maxDelegations, this.config.executionPurpose==='single-model-research'?3:21);
       this.team.limits.maxRepairRounds = 0;
     }
   }
   async run(brief, signal) {
     requireThat(!this.busy,'RUN_BUSY','One runner instance owns one run at a time');
     validateBrief(brief);
+    requireThat(this.config.executionPurpose!=='single-model-research'||this.executionScope==='research-pair','RESEARCH_SCOPE_REQUIRED','Single-model research is limited to the research pair');
     const p=preflight(this.team,this.config);
     requireThat(p.ready,'PREFLIGHT',p.issues.join(', '));
     requireThat(['fixture','dsh'].includes(this.executor.mode),'EXECUTOR','Explicit executor evidence mode required');
@@ -138,6 +139,7 @@ export class AlphaRunner {
     if(role.id==='evaluator') input.candidateHash=digest(upstream.integrator.artifact);
     input.allowedModelRefs=this.config.models.map(m=>m.id);
     if (this.config.executionPurpose === 'single-model-smoke') input.testScope='Single-model connectivity smoke only, not independent review or quality acceptance. Preserve evidence checks and real blockers.';
+    if (this.config.executionPurpose === 'single-model-research') input.testScope='Real single-model exploratory research and design. Main and shadow use fresh contexts but the same model: not independent-model review or quality acceptance. Preserve real source receipts and blockers.';
     this.state.pairs[role.id]={status:'researching',main:role.primary,shadow:role.shadow};
     await this.record('pair-start',{role:role.id});
     const run=(phase)=>this.invoke(role,phase,input,scoped).catch(error=>{ctl.abort(error);throw error;});

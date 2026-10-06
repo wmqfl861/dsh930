@@ -97,3 +97,35 @@ test('research scope rejects a missing research role and unknown scopes',()=>{
  assert.throws(()=>new AlphaRunner({...args,executionScope:'unknown'}),{code:'EXECUTION_SCOPE'});
  assert.throws(()=>new AlphaRunner({...args,team:{...loaded.team,roles:[]},executionScope:'research-pair'}),{code:'RESEARCH_ROLE'});
 });
+
+function singleModelConfig(purpose){
+ const config=fixtureConfig(loaded.team);config.models=config.models.slice(0,1);
+ for(const id of Object.keys(config.bindings))config.bindings[id]={primary:config.models[0].id,shadow:config.models[0].id};
+ return {...config,executionPurpose:purpose,acknowledgeNoIndependentReview:true};
+}
+test('explicit single-model research runs actual research scope with honest non-independent labeling',async t=>{
+ const inputs=[];const {args}=await setup(t,fixtureExecutor(call=>inputs.push(call.input)));args.config=singleModelConfig('single-model-research');
+ const result=await runResearchPair(args);assert.equal(result.executionPurpose,'single-model-research');assert.equal(result.independentReviewConfigured,false);
+ assert.equal(result.qualityAcceptanceGranted,false);assert.equal(result.delegationsReserved,3);assert.equal(inputs.length,3);
+ for(const input of inputs){assert.match(input.testScope,/Real single-model exploratory research/);assert.doesNotMatch(input.testScope,/connectivity smoke only/);}
+});
+test('single-model research requires an explicit same-model acknowledgement',async t=>{
+ const {args}=await setup(t);args.config=singleModelConfig('single-model-research');delete args.config.acknowledgeNoIndependentReview;
+ await assert.rejects(runResearchPair(args),{code:'PREFLIGHT',message:'RESEARCH_ACK_REQUIRED'});
+});
+test('single-model research rejects full-team execution before any delegation',async t=>{
+ let calls=0;const {args}=await setup(t,fixtureExecutor(()=>calls++));args.config=singleModelConfig('single-model-research');
+ await assert.rejects(new AlphaRunner(args).run(brief),{code:'RESEARCH_SCOPE_REQUIRED'});assert.equal(calls,0);
+});
+test('single-model research refuses implicit extra routes and automatic repair',async t=>{
+ const {args,store}=await setup(t);args.config=singleModelConfig('single-model-research');args.config.models.push({...args.config.models[0],id:'other'});
+ await assert.rejects(runResearchPair(args),{code:'PREFLIGHT',message:'RESEARCH_SINGLE_ROUTE_REQUIRED'});
+ args.config=singleModelConfig('single-model-research');let calls=0;args.executor=fixtureExecutor();
+ args.executor.execute=async call=>{calls++;const output=fixtureResponse(call);if(call.phase==='review'){output.verdict='revise';output.findings=[{severity:'risk',target:'draft',reason:'fixture defect',evidence:'fixture',check:'operator review'}];}return output;};
+ await assert.rejects(runResearchPair(args),{code:'REVIEW_NOT_PASSED'});assert.equal(calls,3);assert.equal((await persisted(store)).status,'blocked');
+});
+test('existing same-model smoke retains its diagnostic label',async t=>{
+ const inputs=[];const {args}=await setup(t,fixtureExecutor(call=>inputs.push(call.input)));args.config=singleModelConfig('single-model-smoke');
+ const result=await runResearchPair(args);assert.equal(result.executionPurpose,'single-model-smoke');assert.equal(result.independentReviewConfigured,false);
+ assert.ok(inputs.every(input=>input.testScope.includes('connectivity smoke only')));
+});
