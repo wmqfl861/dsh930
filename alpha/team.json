@@ -3,7 +3,7 @@
   "id": "dsh-alpha",
   "version": "0.1.0",
   "purpose": "研究、建设、组建并验证其他Agent团队；不是固定行业团队。",
-  "baseCommit": "7a83cb480fb61a98483cb8c79a37388295a45237",
+  "baseRef": "refs/tags/dsh930-source/alpha-base-2026-10-01",
   "logicalActors": 14,
   "sharedSkills": [
     "alpha-evidence",

@@ -9,6 +9,8 @@ kind: "package-reference"
 
 应用拥有的 profile 通过启动器信息提供内置包管理器调用方式。它在包操作和 registry 检查中优先于 `pnpmCommand`；其环境仅应用于这些子进程。
 
+在 dsh930 的 Node 24 基线上，pnpm 12 从 `node_modules/.modules.yaml` 读取尚未决定是否允许执行的依赖脚本；仍支持 pnpm 11 的策略占位值。批准仍须指定精确的待批准选择器，并根据当前策略检查；仅列出脚本不会授予执行权限。批准策略变化后，旧布局失效，直到再次安装刷新它。pnpm 12 中的托管 Git 依赖采用规范的 HTTPS 标识；私有 SSH 访问必须通过 Git 自身的 `url.*.insteadOf` 重写配置，不能依赖自动从 HTTPS 回退到 SSH。
+
 ## 概述
 
 管理当前 profile 的插件，无需手动编辑配置。启停单个插件条目、选择已安装的组合包，以及安装或删除外部组合包。在 YAML 中启用 HMR 时，配置变化立即生效；未启用 HMR 时，运行中的组合保留到重启。改动影响使用该 profile 的全部会话。

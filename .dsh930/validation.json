@@ -1,8 +1,12 @@
 {
   "node": "v24.21.0",
   "pnpm": "12.8.1",
-  "sourceCommit": "6b6bb2bcd638952b1c88e3146f4937d604a528df",
+  "sourceRef": "refs/tags/dsh930-source/node24-import-2026-10-01",
   "repairRunId": "36815842580",
+  "repairRunSourceMatchesRecordedSource": false,
+  "evidenceLimitations": [
+    "The repair run head differs from sourceRef. Its success does not establish validation of that source revision. Source tags identify revisions, not validation outcomes."
+  ],
   "steps": {
     "install": "success",
     "build": "success",
@@ -14,7 +18,7 @@
   "fullSuite": "earlier-baseline-has-failures",
   "baseline": {
     "runId": "36813104476",
-    "sourceCommit": "ceb52ab476077c4d0e3676453181b25ffcd6beae",
+    "sourceRef": "https://github.com/wmqfl861/dsh930/actions/runs/36813104476",
     "testShards": [
       {
         "shard": 1,

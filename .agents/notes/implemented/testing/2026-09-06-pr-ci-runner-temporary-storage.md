@@ -10,7 +10,7 @@ The Linux failover pool runs multiple runner instances on one VM. PR coverage an
 
 ## Decision
 
-The static, coverage, and consumer jobs in [PR CI](../../../../.github/workflows/ci.yml) export `TMPDIR=runner.temp` through `GITHUB_ENV` in their first step before any setup or test process starts. Node, Vite, tsx, and temporary test consumers inherit the runner-owned location. Each runner owns its directory and GitHub Actions clears its removable contents at job start and completion; fixtures still allocate unique children and retain their own cleanup.
+The static, coverage, and consumer jobs in [PR CI](../../../../.github/upstream-workflows/ci.yml) export `TMPDIR=runner.temp` through `GITHUB_ENV` in their first step before any setup or test process starts. Node, Vite, tsx, and temporary test consumers inherit the runner-owned location. Each runner owns its directory and GitHub Actions clears its removable contents at job start and completion; fixtures still allocate unique children and retain their own cleanup.
 
 npm keeps its configured persistent cache, normally `$HOME/.npm` on POSIX, without a per-job override in the main CI or release workflows. The pnpm store remains shared at `$HOME/.local/share/pnpm/store`. Both retain cross-runner reuse under the package managers’ concurrent-access support; shared-cache capacity and filesystem failures remain operational responsibilities. The consumer job places Playwright browser downloads and installation locks beside `RUNNER_TEMP`; hosted cache restore uses that same location.
 

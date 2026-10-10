@@ -10,7 +10,7 @@ Wall-clock performance checks need an isolated execution lane and a consistent r
 
 ## Decision
 
-The required benchmark job in [ci.yml](../../../../.github/workflows/ci.yml) uses the standard GitHub-hosted `ubuntu-24.04` runner independently of Linux failover. It always attempts to restore the pnpm store cache and retains a standalone benchmark lane. The complete job has a 15-minute timeout covering setup, installation, builds, and measurements. This bounds infrastructure execution, not an individual performance assertion.
+The required benchmark job in [ci.yml](../../../../.github/upstream-workflows/ci.yml) uses the standard GitHub-hosted `ubuntu-24.04` runner independently of Linux failover. It always attempts to restore the pnpm store cache and retains a standalone benchmark lane. The complete job has a 15-minute timeout covering setup, installation, builds, and measurements. This bounds infrastructure execution, not an individual performance assertion.
 
 The [Session performance decision](2026-09-04-session-open-performance-gate.md) continues to own workloads, timing and memory budgets, worker isolation, and calibration. Only current-generation `open` uses an endpoint-specific 50 ms standard-runner expectation with the existing 1.25× headroom, giving a 63 ms limit. All other performance budgets and the worker, test, and hook deadlines remain unchanged. Successful raw measurements remain in the Actions log through step-local `DSH_GATE_VERBOSE=1`. The hardware-comparison workflows retain their deliberately different runner sizes.
 

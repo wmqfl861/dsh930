@@ -19,6 +19,12 @@ test('model metadata failure propagates before any child',async()=>{const h=host
 test('model override, read-only allowlist and persona reach native start and handle is disposed',async()=>{const h=host();await createDshExecutor(h.ctx,{id:'parent'}).execute(request);const r=h.calls[0].request;assert.equal(r.agentOptions.model,'b');assert.deepEqual(r.toolFilter,{allow:['web_search','web_fetch']});assert.equal(r.maxDepth,1);assert.equal(h.disposed,1);});
 test('malformed output is an error and still disposes the child',async()=>{const h=host();h.ctx.subagents.start=async()=>({result:Promise.resolve({stopReason:'completed',output:[{type:'text',text:'not json'}]}),dispose:async()=>h.calls.push('disposed')});await assert.rejects(createDshExecutor(h.ctx,{}).execute(request),{code:'DSH_JSON'});assert.ok(h.calls.includes('disposed'));});
 test('abnormal child completion cannot be normalized to success',async()=>{const h=host();h.ctx.subagents.start=async()=>({result:Promise.resolve({stopReason:'max-tokens',output:[]}),dispose:async()=>h.calls.push('disposed')});await assert.rejects(createDshExecutor(h.ctx,{}).execute(request),{code:'DSH_CHILD_FAILED'});assert.ok(h.calls.includes('disposed'));});
+test('observer and child asynchronous disposers are awaited before adapter completion',async()=>{
+ const h=host();let observerClosed=false,childClosed=false;
+ h.ctx.on=()=>async()=>{await new Promise(r=>setTimeout(r,5));observerClosed=true;};
+ h.ctx.subagents.start=async()=>({id:'child',localAgent:{id:'child'},result:Promise.resolve({stopReason:'completed',output:[{type:'text',text:'{"sources":[]}'}]}),dispose:async()=>{assert.equal(observerClosed,true);await new Promise(r=>setTimeout(r,5));childClosed=true;}});
+ await createDshExecutor(h.ctx,{}).execute(request);assert.equal(observerClosed,true);assert.equal(childClosed,true);
+});
 test('abort interrupts a waiting result and disposal is awaited',async()=>{
  const h=host(),ctl=new AbortController();let closed=false;
  h.ctx.subagents.start=async()=>({result:new Promise(()=>{}),dispose:async()=>{await new Promise(r=>setTimeout(r,5));closed=true;}});
@@ -40,3 +46,19 @@ test('search snippets alone do not satisfy fetched source admission',async()=>{c
 test('another agents fetch cannot satisfy this shadows independent research',async()=>{const h=researchHost({other:true});await assert.rejects(createDshExecutor(h.ctx,{}).execute(researchRequest),{code:'RESEARCH_NOT_FETCHED'});});
 test('an errored fetch does not satisfy source admission',async()=>{const h=researchHost({error:true});await assert.rejects(createDshExecutor(h.ctx,{}).execute(researchRequest),{code:'RESEARCH_NOT_FETCHED'});});
 test('native receipt binds the actual child and replaces forged host metadata',async()=>{const h=researchHost();const r=await createDshExecutor(h.ctx,{}).execute(researchRequest);assert.equal(r._host.childId,'own');assert.equal(r._host.toolReceipts.length,1);assert.match(r._host.toolReceipts[0].contentHash,/^[a-f0-9]{64}$/);});
+test('generated web specialist requires its own fetched source receipt regardless of name',async()=>{
+ const call={...request,role:{id:'step:unfamiliar-specialist',tools:['web_fetch'],requiresFetchedSources:true}};
+ const missing=researchHost({receipt:false});await assert.rejects(createDshExecutor(missing.ctx,{}).execute(call),{code:'RESEARCH_NOT_FETCHED'});
+ const borrowed=researchHost({other:true});await assert.rejects(createDshExecutor(borrowed.ctx,{}).execute(call),{code:'RESEARCH_NOT_FETCHED'});
+ const present=researchHost();const result=await createDshExecutor(present.ctx,{}).execute(call);assert.equal(result._host.childId,'own');
+});
+test('cleanup failures drain both paths and preserve the original child error',async()=>{
+ const h=host();let disposed=false;h.ctx.on=()=>async()=>{throw new Error('observer cleanup');};
+ h.ctx.subagents.start=async()=>({id:'child',result:Promise.resolve({stopReason:'completed',output:[{type:'text',text:'invalid JSON'}]}),dispose:async()=>{disposed=true;throw new Error('child cleanup');}});
+ await assert.rejects(createDshExecutor(h.ctx,{}).execute(request),{code:'DSH_JSON'});assert.equal(disposed,true);
+});
+test('observer cleanup failure remains visible after successful child output and child disposal',async()=>{
+ const h=host();let disposed=false;h.ctx.on=()=>async()=>{throw new Error('observer cleanup');};
+ h.ctx.subagents.start=async()=>({id:'child',result:Promise.resolve({stopReason:'completed',output:[{type:'text',text:'{"sources":[]}'}]}),dispose:async()=>{disposed=true;}});
+ await assert.rejects(createDshExecutor(h.ctx,{}).execute(request),/observer cleanup/);assert.equal(disposed,true);
+});

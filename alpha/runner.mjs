@@ -2,7 +2,8 @@
 import { mkdir, open, readFile, rename, unlink, lstat } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
 import { join, resolve } from 'node:path';
-import { AlphaError, requireThat, copy, digest, preflight, validateBrief, validateOutput, validateCandidate, rolePrompt } from './core.mjs';
+import { AlphaError, requireThat, copy, digest, preflight, validateBrief, validateOutput, validateCandidate, rolePrompt, validateRuntimeTeam } from './core.mjs';
+import { OFFLINE_MODE, offlineManifest } from './offline.mjs';
 
 /** Private local run directory. A concurrent or stale writer fails closed, never silently replays. */
 export class RunStore {
@@ -40,20 +41,25 @@ export class RunStore {
 
 /** Each run captures immutable team, skill, model, brief and policy versions. */
 export class AlphaRunner {
-  constructor({team,skills,revision,config,executor,store,executionScope='team'}) {
-    requireThat(['team','research-pair'].includes(executionScope),'EXECUTION_SCOPE','Unknown Alpha execution scope');
+  constructor({team,skills,revision,config,executor,store,executionScope='team',invocation}) {
+    requireThat(['team','research-pair','generated-team'].includes(executionScope),'EXECUTION_SCOPE','Unknown Alpha execution scope');
     this.team=copy(team); this.skills=copy(skills); this.revision=revision; this.config=copy(config);
-    this.executor=executor; this.store=store; this.busy=false;
+    this.executor=executor; this.store=store; this.busy=false; this.manifestTeam=copy(team);
     this.executionScope=executionScope;
+    this.invocation=invocation===undefined?undefined:copy(invocation);
+    if (executionScope === 'generated-team') {
+      validateRuntimeTeam(this.team);
+      requireThat(['team-building','single-model-team-trial'].includes(this.config.executionPurpose ?? 'team-building'),'GENERATED_REVIEW','Generated teams require independent-model review or an explicit same-model trial');
+    }
     if (executionScope === 'research-pair') {
       const research=this.team.roles.find(role=>role.id==='research');
       requireThat(research,'RESEARCH_ROLE','Research scope requires the research pair');
       this.team.roles=[{...research,dependsOn:[]}];
       this.team.logicalActors=2;
     }
-    if (['single-model-smoke','single-model-research'].includes(this.config.executionPurpose)) {
+    if (['single-model-smoke','single-model-research','single-model-team-trial'].includes(this.config.executionPurpose)) {
       this.team.limits.maxConcurrentPairs = 1;
-      this.team.limits.maxDelegations = Math.min(this.team.limits.maxDelegations, this.config.executionPurpose==='single-model-research'?3:21);
+      this.team.limits.maxDelegations = Math.min(this.team.limits.maxDelegations, this.config.executionPurpose==='single-model-smoke'?21:3);
       this.team.limits.maxRepairRounds = 0;
     }
   }
@@ -64,11 +70,15 @@ export class AlphaRunner {
     const p=preflight(this.team,this.config);
     requireThat(p.ready,'PREFLIGHT',p.issues.join(', '));
     requireThat(['fixture','dsh'].includes(this.executor.mode),'EXECUTOR','Explicit executor evidence mode required');
+    if(this.executor.offline===true) requireThat(this.executor.offlineMode===OFFLINE_MODE,'OFFLINE_EXECUTOR','Offline injection must use the registered fixture bridge');
     this.busy=true;
     const ctl=new AbortController();
     const runSignal=signal ? AbortSignal.any([signal,ctl.signal]) : ctl.signal;
     this.state={schemaVersion:1,id:randomUUID(),mode:this.executor.mode,status:'preflight',executionPurpose:p.executionPurpose,independentReviewConfigured:p.independentReviewConfigured,qualityAcceptanceGranted:false,brief:copy(brief),briefHash:digest(brief),teamRevision:this.revision,configHash:digest(this.config),delegationsReserved:0,events:[],pairs:{},createdAt:new Date().toISOString()};
-    if(this.executionScope==='research-pair')this.state.executionScope=this.executionScope;
+    if(this.invocation!==undefined)this.state.invocation=copy(this.invocation);
+    if(this.executor.offline===true) this.state.offlineManifest=offlineManifest({team:this.manifestTeam,revision:this.revision,config:this.config});
+    if(this.executionScope!=='team')this.state.executionScope=this.executionScope;
+    if(this.executionScope==='generated-team') {this.state.team=copy(this.team);this.state.blueprintHash=this.team.blueprintHash;}
     let created=false;
     try {
       runSignal.throwIfAborted();
@@ -83,6 +93,13 @@ export class AlphaRunner {
         const settled=await Promise.allSettled(ready.map(role=>this.pair(role,runSignal).catch(error=>{ctl.abort(error);throw error;})));
         const failed=settled.find(r=>r.status==='rejected'); if(failed) throw failed.reason;
         for(const role of ready) pending.delete(role.id);
+      }
+      if(this.executionScope==='generated-team') {
+        runSignal.throwIfAborted();
+        this.state.status=this.executor.mode==='fixture'?'fixture_complete':'awaiting_human_acceptance';
+        this.state.outputs=Object.fromEntries(this.team.roles.map(role=>[role.task.id,copy(this.state.pairs[role.id].draft.artifact)]));
+        await this.record('run-end',{status:this.state.status});
+        return copy(this.state);
       }
       if(this.executionScope==='research-pair') {
         this.state.status=this.executor.mode==='fixture'?'fixture_complete':'research_reviewed';
@@ -134,10 +151,13 @@ export class AlphaRunner {
     this.reserve(3);
     const ctl=new AbortController();
     const scoped=AbortSignal.any([signal,ctl.signal,AbortSignal.timeout(this.team.limits.pairTimeoutMs)]);
-    const upstream=Object.fromEntries(role.dependsOn.map(id=>[id,copy(this.state.pairs[id].draft)]));
+    const upstream=Object.fromEntries(role.dependsOn.map(id=>[this.executionScope==='generated-team'?this.team.roles.find(r=>r.id===id).task.id:id,copy(this.state.pairs[id].draft)]));
     const input={brief:copy(this.state.brief),briefHash:this.state.briefHash,upstream};
-    if(role.id==='evaluator') input.candidateHash=digest(upstream.integrator.artifact);
+    if(this.executionScope==='team'&&role.id==='evaluator') input.candidateHash=digest(upstream.integrator.artifact);
     input.allowedModelRefs=this.config.models.map(m=>m.id);
+    input.availableSkills=Object.keys(this.skills);
+    if(role.task) {input.step=copy(role.task);input.member=copy(role.member);}
+    if (this.config.executionPurpose === 'single-model-team-trial') input.testScope='Same-model team trial: fresh contexts, not heterogeneous-model review or quality acceptance. No automatic retries or media generation.';
     if (this.config.executionPurpose === 'single-model-smoke') input.testScope='Single-model connectivity smoke only, not independent review or quality acceptance. Preserve evidence checks and real blockers.';
     if (this.config.executionPurpose === 'single-model-research') input.testScope='Real single-model exploratory research and design. Main and shadow use fresh contexts but the same model: not independent-model review or quality acceptance. Preserve real source receipts and blockers.';
     this.state.pairs[role.id]={status:'researching',main:role.primary,shadow:role.shadow};

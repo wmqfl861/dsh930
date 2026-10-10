@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "recordedAt": "2026-10-01T09:18:48.408932+00:00",
-  "sourceCommit": "0dc80141c8b55432fa2dfb01ad6f9fd64b51e152",
+  "sourceRef": "refs/tags/dsh930-source/node24-sandbox-2026-10-01",
   "repository": "wmqfl861/dsh930",
   "branch": "dev/node24",
   "sandbox": {

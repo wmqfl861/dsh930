@@ -28,4 +28,4 @@ Python sidecar 组装仅复制所选引擎及其依赖闭包。wheel 打包和�
 
 新增引擎包标识还需要更新 `scripts/gen-third-party-notices.ts` 中的 `LIBREOFFICE_PACKAGES`、`pnpm-workspace.yaml` 中适用的 `minimumReleaseAgeExclude` 条目，以及 [kit 归属记录](2026-09-14-independent-libreoffice-kit.zh.md)中的包列表。许可证允许列表仍使用明确的包标识。
 
-[公开 Python 发布工作流](../../../../.github/workflows/python-release.yml)拒绝任何大于等于 100,000,000 字节的 wheel。只选择一个引擎会减少载荷，但不能据此认定运行时 wheel 已满足此限制；npm 引擎发布、本地转换与 wheel 上传资格是不同的验证。
+[公开 Python 发布工作流](../../../../.github/upstream-workflows/python-release.yml)拒绝任何大于等于 100,000,000 字节的 wheel。只选择一个引擎会减少载荷，但不能据此认定运行时 wheel 已满足此限制；npm 引擎发布、本地转换与 wheel 上传资格是不同的验证。

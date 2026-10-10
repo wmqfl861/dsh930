@@ -10,7 +10,7 @@ Status: implemented
 
 ## 决定
 
-[ci.yml](../../../../.github/workflows/ci.yml) 中的必需 benchmark job 使用标准 GitHub 托管 `ubuntu-24.04` 运行器，不受 Linux 故障转移影响。它始终尝试恢复 pnpm 存储缓存，并保留独立的 benchmark lane。整个 job 的超时为 15 分钟，覆盖准备、安装、构建和测量。这限制的是基础设施执行时间，而非单项性能断言。
+[ci.yml](../../../../.github/upstream-workflows/ci.yml) 中的必需 benchmark job 使用标准 GitHub 托管 `ubuntu-24.04` 运行器，不受 Linux 故障转移影响。它始终尝试恢复 pnpm 存储缓存，并保留独立的 benchmark lane。整个 job 的超时为 15 分钟，覆盖准备、安装、构建和测量。这限制的是基础设施执行时间，而非单项性能断言。
 
 [Session 性能决策](2026-09-04-session-open-performance-gate.zh.md) 继续拥有工作负载、时间和内存预算、worker 隔离及校准。仅当前 generation `open` 使用端点专属的 50 ms 标准运行器预期值，乘以既有 1.25 倍余量后得到 63 ms 上限。其他性能预算以及 worker、测试和钩子的截止时间均保持不变。步骤级 `DSH_GATE_VERBOSE=1` 使成功运行的原始测量保留在 Actions 日志中。硬件比较工作流保留有意设置的不同运行器规格。
 

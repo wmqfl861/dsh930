@@ -3,7 +3,7 @@ import { AlphaError, requireThat, digest } from './core.mjs';
 
 export const outputInstructions = {
   prepare: 'Return ONLY JSON: {"coverage":["questions investigated"],"sources":[{"id":"s1","url":"https://...","accessedAt":"ISO8601","supports":"exact supported claim"}],"checks":["independent checks prepared"],"uncertainties":[]}. Sources may be empty if none actually fetched. Do not invent evidence.',
-  draft: 'Return ONLY JSON: {"summary":"...","artifact":{},"sources":[],"alternatives":[{"route":"...","reason":"..."}],"openQuestions":[],"experiments":[{"status":"not_executed","method":"..."}]}. If only one route exists, alternatives may be empty but singleRouteReason must explain the search scope. Sources use {id,url,accessedAt,supports}. Executed experiments require status=executed and a real receipt reference. Integrator artifact MUST contain {objective,members:[{id,modelRef,responsibility,skills:[],tools:[]}],steps:[{id,owner,dependsOn:[],input,output,check,onFailure}],gaps:[],acceptance:[]}; unresolved capabilities remain in gaps. Evaluator artifact MUST contain acceptedCandidateHash equal to the exact integrated candidate hash provided by the host, only if evaluated; otherwise return unresolved questions.',
+  draft: 'Return ONLY JSON: {"summary":"...","artifact":{},"sources":[],"alternatives":[{"route":"...","reason":"..."}],"openQuestions":[],"experiments":[{"status":"not_executed","method":"..."}]}. If only one route exists, alternatives may be empty but singleRouteReason must explain the search scope. Sources use {id,url,accessedAt,supports}. Executed experiments require status=executed and a real receipt reference. Integrator artifact MUST contain {objective,members:[{id,modelRef,shadowModelRef,responsibility,skills:[],tools:[]}],steps:[{id,owner,dependsOn:[],input,output,check,onFailure}],gaps:[],acceptance:[]}; Use only allowedModelRefs and availableSkills from input, distinct primary/shadow models, web_search/web_fetch or no tools, and onFailure="stop". Keep unsupported capabilities in gaps. Evaluator artifact MUST contain acceptedCandidateHash equal to the exact integrated candidate hash provided by the host, only if evaluated; otherwise return unresolved questions.',
   review: 'Return ONLY JSON: {"subjectHash":"exact hash provided by host","verdict":"pass|revise|blocked","sources":[],"checked":["checks actually performed"],"findings":[{"severity":"blocker|risk|suggestion","target":"...","reason":"...","evidence":"specific evidence or counterexample","check":"how to verify resolution"}]}. pass cannot coexist with unresolved blockers or risks. No minimum finding count. Do not invent tests or sources.',
 };
 
@@ -27,7 +27,8 @@ export function createDshExecutor(ctx,parent,{provider='spawn',onReceipt=()=>{}}
       const instructions=outputInstructions[phase==='revise'?'draft':phase];
       requireThat(instructions,'PHASE','Unsupported actor phase');
       signal.throwIfAborted();
-      let run;
+      let run,outcome;
+      const errors=[];
       const observed=[];
       requireThat(typeof ctx.on==='function','DSH_OBSERVER','Native result observer is required');
       const disposeObserver=ctx.on('tools/result',(exec,result)=>{
@@ -55,15 +56,22 @@ export function createDshExecutor(ctx,parent,{provider='spawn',onReceipt=()=>{}}
         let value;
         try { value=JSON.parse(text); } catch { throw new AlphaError('DSH_JSON','Subagent did not return valid standalone JSON'); }
         const receipts=observed.filter(r=>r.agent===run.localAgent).map(({agent:_agent,...r})=>r);
-        if(['research','model-lab','skill-lab'].includes(role.id)&&['draft','prepare'].includes(phase)) {
+        if((role.requiresFetchedSources===true||['research','model-lab','skill-lab'].includes(role.id))&&['draft','prepare'].includes(phase)) {
           const fetched=new Set(receipts.filter(r=>r.tool==='web_fetch'&&!r.isError).map(r=>r.url));
           requireThat(value.sources?.some(s=>fetched.has(s.url)), 'RESEARCH_NOT_FETCHED', 'Research requires cited source text actually fetched by this exact child; search snippets/self-report are insufficient');
         }
-        return {...value,_host:{childId:run.id,provider:model.provider,model:model.model,toolReceipts:receipts}};
+        outcome={...value,_host:{childId:run.id,provider:model.provider,model:model.model,toolReceipts:receipts}};
+      } catch(error) {
+        errors.push(error);
       } finally {
-        disposeObserver();
-        if(run) await run.dispose();
+        // Drain both cleanup paths and preserve the earliest execution or cleanup error.
+        try { await disposeObserver(); } catch (error) { errors.push(error); }
+        if(run) {
+          try { await run.dispose(); } catch (error) { errors.push(error); }
+        }
       }
+      if(errors.length) throw errors[0];
+      return outcome;
     },
   };
 }

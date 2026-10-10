@@ -10,7 +10,7 @@ Linux 故障切换池在同一台虚拟机上运行多个 runner 实例。PR 覆
 
 ## 决策
 
-[PR CI](../../../../.github/workflows/ci.yml) 的静态检查、覆盖率和消费者作业在任何准备或测试进程启动前，在首个步骤通过 `GITHUB_ENV` 导出 `TMPDIR=runner.temp`。Node、Vite、tsx 和临时测试消费者继承 runner 管理的位置。每个 runner 管理自己的目录，GitHub Actions 在作业开始和完成时清除其中可删除的内容；测试夹具仍分配唯一子目录，并保留自身清理逻辑。
+[PR CI](../../../../.github/upstream-workflows/ci.yml) 的静态检查、覆盖率和消费者作业在任何准备或测试进程启动前，在首个步骤通过 `GITHUB_ENV` 导出 `TMPDIR=runner.temp`。Node、Vite、tsx 和临时测试消费者继承 runner 管理的位置。每个 runner 管理自己的目录，GitHub Actions 在作业开始和完成时清除其中可删除的内容；测试夹具仍分配唯一子目录，并保留自身清理逻辑。
 
 npm 保留配置的持久化缓存，在 POSIX 上通常为 `$HOME/.npm`；主 CI 和发布工作流不设置每作业覆盖。pnpm store 保持共享于 `$HOME/.local/share/pnpm/store`。两者依靠包管理器的并发访问支持保留跨 runner 复用；共享缓存容量及文件系统故障仍由运维负责。消费者作业将 Playwright 浏览器下载和安装锁放在 `RUNNER_TEMP` 旁；托管缓存恢复使用同一位置。
 

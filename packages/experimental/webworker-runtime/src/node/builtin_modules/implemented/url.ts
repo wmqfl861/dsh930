@@ -67,6 +67,7 @@ export const __esModule = true
 type NodeFace = Partial<Omit<typeof import('node:url'), 'URL' | 'URLSearchParams'>>
   & Record<'URL' | 'URLSearchParams', unknown>
 
+/** URL conversion helpers and browser URL classes exposed to worker modules. */
 const urlModule = {
   fileURLToPath, pathToFileURL, resolve, URL: UrlClass, URLSearchParams: UrlSearchParamsClass,
 }

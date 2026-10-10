@@ -2,13 +2,13 @@
 
 状态：原生研究单对离线切片已验收；真实链路、研究质量与业务试跑仍待授权及执行
 分支：feat/alpha-luna-smoke
-基线提交：32692ccecc86ed6ba0aa63ac80a9542126a713fb
+基线提交：`dsh930-source/alpha-work-package-2026-10-06`
 
 ## 2026-10-06 原生研究单对离线切片收口
 
 此小节更新本切片状态；下方原阶段计划及历史阻塞保留，不将离线结果提升为真实模型或业务质量验收。
 
-- 已验收代码：[`c61f0a6fc3fa43bd7a76a6c476ac4eb256b6701a`](https://github.com/wmqfl861/dsh930/commit/c61f0a6fc3fa43bd7a76a6c476ac4eb256b6701a)，直接父提交为 `6114c265825b97b7aca6780e1e4b48cb74579d5d`
+- 已验收代码绑定 [CI 37451568333](https://github.com/wmqfl861/dsh930/actions/runs/37451568333) 的运行源版本；该版本及其直接父提交由[验收记录](https://github.com/wmqfl861/dsh930/issues/10#issuecomment-6014703075)保留。
 - 新增原生 `alpha_research_pair` 工具，复用现有运行器、执行器与 RunStore；不依赖 integrator，不另建执行或持久化架构
 - 本地 Alpha 115 项测试、完整提交检查和 6 个原生离线场景通过：研究成功、取消、失败、live-disabled 拒绝、跨 child 证据拒绝与旧全队流程；包含相应清理和锁释放检查
 - 研究单对为 2 个逻辑角色、3 次委派，审核绑定具体草稿版本；旧全队 7 对、21 次委派回归保留

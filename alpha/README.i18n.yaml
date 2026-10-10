@@ -1,0 +1,34 @@
+# Bilingual-pair consistency record for README.md (docs/i18n/README.md): per heading
+# section, a hash of its English and Chinese blocks outside code blocks and generated regions.
+# After editing either side, bring the other along and re-record with:
+#   pnpm run verify-translation-pairing --write alpha/README.md
+/dsh-alpha-team-0-1-0:
+  en: 297a8f62ffd3875c
+  zh: 26199ee98ebac19a
+/dsh-alpha-team-0-1-0/deliverables-and-status:
+  en: 1a1ac3fdd436a20c
+  zh: 9b1adf59734fb06d
+/dsh-alpha-team-0-1-0/roles:
+  en: 805add28e463005d
+  zh: bdc06e03e209d30f
+/dsh-alpha-team-0-1-0/keyless-checks:
+  en: 8c3191d367c28a65
+  zh: 5210e82996207c9c
+/dsh-alpha-team-0-1-0/connect-to-real-dsh:
+  en: 14d3883d855b23e6
+  zh: f4e8b669ef7a0932
+/dsh-alpha-team-0-1-0/program-enforced-rules:
+  en: 707c429736e90eab
+  zh: ae4cfe600ac981fc
+/dsh-alpha-team-0-1-0/limitations-that-must-remain-explicit:
+  en: 466e05446fa3920c
+  zh: 0364907c57214b35
+/dsh-alpha-team-0-1-0/comparison-with-the-pi-route:
+  en: a21c1e3e7f49a8aa
+  zh: 7437bf8333de8707
+/dsh-alpha-team-0-1-0/initial-validation-record:
+  en: 8c3800117987e335
+  zh: 54fa1b0049753fbc
+/dsh-alpha-team-0-1-0/execute-generated-teams:
+  en: fbd5f6bda4dc2c3c
+  zh: cf3ff7463132c0cc

@@ -27,7 +27,7 @@ function verifyResearch(state){
  const firstEnd=state.events.findIndex(e=>e.type==='actor-end');assert.ok(state.events.findIndex(e=>e.type==='actor-start'&&e.phase==='draft')<firstEnd);
 }
 try{
- for(const scenario of ['team','research','cancel','failure','liveoff','borrowed']){
+ for(const scenario of ['generated','generated-cancel','generated-failure','team','research','cancel','failure','liveoff','borrowed']){
   const home=join(tmp,scenario),conf=join(tmp,scenario+'-models.json'),patch=join(tmp,scenario+'-overlay.json'),runs=join(tmp,scenario+'-runs');
   const {team}=await loadTeam();const config=fixtureConfig(team);if(scenario==='liveoff')config.liveEnabled=false;
   await writeFile(conf,JSON.stringify(config));await writeFile(patch,JSON.stringify([
@@ -47,6 +47,12 @@ try{
   const states=await Promise.all(names.filter(f=>f.endsWith('.json')).map(async f=>JSON.parse(await readFile(join(runs,f),'utf8'))));
   if(scenario==='team'){
    assert.equal(states.length,1);assert.equal(Object.keys(states[0].pairs).length,7);assert.equal(states[0].delegationsReserved,21);assert.equal(states[0].status,'awaiting_human_acceptance');
+  }else if(scenario.startsWith('generated')){
+   assert.equal(states.length,scenario==='generated'?1:2);const state=states.find(s=>s.status==='awaiting_human_acceptance');
+   if(scenario!=='generated'){const stopped=states.find(s=>s!==state);assert.equal(stopped.status,scenario.endsWith('cancel')?'cancelled':'blocked');assert.equal(stopped.executionScope,'generated-team');}
+   assert.equal(state.executionScope,'generated-team');assert.equal(state.status,'awaiting_human_acceptance');assert.equal(state.qualityAcceptanceGranted,false);assert.equal(state.delegationsReserved,3);assert.deepEqual(Object.keys(state.outputs),['s1']);
+   const pair=state.pairs['step:0'];assert.equal(pair.review.subjectHash,digest(pair.draft));assert.equal(new Set([pair.prep,pair.draft,pair.review].map(v=>v._host.childId)).size,3);
+   for(const [phase,value] of [['prepare',pair.prep],['draft',pair.draft]]){const receipt=value._host.toolReceipts.find(r=>r.tool==='web_fetch'&&!r.isError);assert.equal(receipt?.url,`https://fixture.invalid/alpha-method/step:0/${phase}`);assert.ok(value.sources.some(source=>source.url===receipt.url));}
   }else if(scenario==='liveoff')assert.equal(states.length,0);
   else{
    const success=states.filter(s=>s.status==='research_reviewed');assert.equal(success.length,1);verifyResearch(success[0]);
